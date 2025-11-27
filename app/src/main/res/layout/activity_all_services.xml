@@ -17,7 +17,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="12dp"
             android:iconifiedByDefault="false"
-            android:queryHint="Rechercher un service" />
+            android:queryHint="@string/search" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -122,13 +122,13 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/retour"
+        android:id="@+id/retour2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Retour"
+        android:contentDescription="@string/btn_back"
         android:src="@android:drawable/ic_media_previous"
-        app:backgroundTint="#61AF32" />
+        app:backgroundTint="@color/btn_back" />
 
 </FrameLayout>

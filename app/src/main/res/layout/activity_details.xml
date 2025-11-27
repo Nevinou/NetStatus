@@ -167,13 +167,13 @@
     </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/retour"
+        android:id="@+id/retour1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Retour"
+        android:contentDescription="@string/btn_back"
         android:src="@android:drawable/ic_media_previous"
-        app:backgroundTint="#77E63F" />
+        app:backgroundTint="@color/btn_back" />
 
 </FrameLayout>

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">NetStatus</string>
+    <string name="title_main">Services principaux</string>
+    <string name="logo">Logo</string>
+    <string name="btn_more">Voir plus</string>
+    <string name="reload">Actualliser</string>
+    <string name="search">Rechercher un service</string>
+    <string name="btn_back">Retour</string>
 </resources>

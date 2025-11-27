@@ -1,6 +1,9 @@
 package com.example.netstatus;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +11,25 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class DetailsActivity extends AppCompatActivity {
+
+    void init(){
+        Intent datas = getIntent();
+
+        TextView title = findViewById(R.id.nomService);
+        title.setText(datas.getStringExtra("Name"));
+
+        FloatingActionButton back = findViewById(R.id.retour1);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,8 +38,10 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_details);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left+20, systemBars.top, systemBars.right+20, systemBars.bottom);
             return insets;
         });
+
+        init();
     }
 }
