@@ -6,4 +6,12 @@
     <string name="reload">Actualliser</string>
     <string name="search">Rechercher un service</string>
     <string name="btn_back">Retour</string>
+
+    <string name="string_status">Statut :</string>
+    <string name="oper">Opérationnel</string>
+    <string name="warn">Problème mineur</string>
+    <string name="broken">Panne majeure</string>
+    <string name="hard_broken">Panne critique</string>
+    <string name="disabled">Maintenance</string>
+    <string name="unknown">Statut inconnu</string>
 </resources>

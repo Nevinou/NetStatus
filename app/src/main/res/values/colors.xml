@@ -4,4 +4,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="btn_back">#6EE633</color>
     <color name="btn_more">#4472FF</color>
+
+    <color name="oper">#4CAF50</color>
+    <color name="warn">#FFC107</color>
+    <color name="broken">#FF9800</color>
+    <color name="hard_broken">#F44336</color>
+    <color name="disabled">#2196F3</color>
+    <color name="unknown">#9E9E9E</color>
 </resources>
