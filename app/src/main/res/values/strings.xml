@@ -6,6 +6,7 @@
     <string name="reload">Actualliser</string>
     <string name="search">Rechercher un service</string>
     <string name="btn_back">Retour</string>
+    <string name="description_scolling_view">Liste des services</string>
 
     <string name="string_status">Statut :</string>
     <string name="oper">Opérationnel</string>
