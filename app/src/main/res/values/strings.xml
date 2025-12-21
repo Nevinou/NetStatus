@@ -15,4 +15,12 @@
     <string name="hard_broken">Panne critique</string>
     <string name="disabled">Maintenance</string>
     <string name="unknown">Statut inconnu</string>
+
+    <!-- activity details -->
+    <string name="app_icon">Icon</string>
+    <string name="refresh">rafréchir</string>
+    <string name="status_icon">Icon Status</string>
+    <string name="last_update">Dernière mise à jour : </string>
+
+
 </resources>

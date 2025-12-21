@@ -19,8 +19,9 @@ public class DetailsActivity extends AppCompatActivity {
         Intent datas = getIntent();
 
         TextView title = findViewById(R.id.nomService);
-        title.setText(datas.getStringExtra("Name"));
+        title.setText(datas.getStringExtra("serviceName"));
 
+        // Création du boutons pour revenir en arrière
         FloatingActionButton back = findViewById(R.id.retour);
         back.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -19,22 +19,26 @@ public class MainActivity extends AppCompatActivity {
     List<String> apis;
 
     void init(){
+        //ajout des urls qui utilisent statuspage.io
         apis = new ArrayList<String>();
         apis.add("https://discordstatus.com");
         apis.add("https://www.githubstatus.com");
         apis.add("https://www.cloudflarestatus.com");
         apis.add("https://www.redditstatus.com");
         apis.add("https://status.atlassian.com");
-        apis.add("https://status.dropbox.com");//ajout des urls qui utilisent statuspage.io
+        apis.add("https://status.dropbox.com");
 
-        Thread thread = new Thread(new LoadAPI(this,apis)); //le réseau doit être fait dans un thread externe
+        //le réseau doit être fait dans un thread externe
+        Thread thread = new Thread(new LoadAPI(this,apis));
         thread.start();
 
-        Button more = findViewById(R.id.more); //on prend le boutton de l'activity qui a l'id "more"
+        //on prend le boutton de l'activity qui a l'id "more"
+        Button more = findViewById(R.id.more);
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,AllServicesActivity.class); //on fait un itent pour changer de page
+                //on fait un itent pour changer de page
+                Intent intent = new Intent(MainActivity.this,AllServicesActivity.class);
                 startActivity(intent); //on change d'activity
             }
         });

@@ -73,9 +73,11 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                     return; //on execute pas le reste
                 }
 
-                LinearLayout parent = activity.findViewById(R.id.main); // doit être fait après le setContentView ! Récupération du parent (layout)
+                // doit être fait après le setContentView ! Récupération du parent (layout)
+                LinearLayout parent = activity.findViewById(R.id.main);
                 //Log.d("working",serviceName);
-                CardView card = (CardView) LayoutInflater.from(activity).inflate(R.layout.template_main,parent,false); //on copie le layout card avec inflate.from et on définit le parent. False = ne pas parenter automatiquement
+                //on copie le layout card avec inflate.from et on définit le parent. False = ne pas parenter automatiquement
+                CardView card = (CardView) LayoutInflater.from(activity).inflate(R.layout.template_main,parent,false);
 
                 TextView titre = card.findViewById(R.id.titre); //récupération du titre de la card
                 titre.setText(serviceName); //on définit un texte
@@ -86,8 +88,11 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                 card.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(activity,DetailsActivity.class); //création d'un itent vers Details
-                        intent.putExtra("LienAPI",site); //on met un extra de donnée
+                        //création d'un itent vers Details
+                        Intent intent = new Intent(activity,DetailsActivity.class);
+                        //on met un extra de donnée
+                        intent.putExtra("LienAPI",site);
+                        intent.putExtra("serviceName",serviceName);
                         activity.startActivity(intent); //on affiche l'activity
                     }
                 });
@@ -97,7 +102,8 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
     }
 
     void displayAlert(String text){
-        activity.runOnUiThread(new Runnable() { //les uis doivent tourner sur le thread ui, on utilise cette méthode pour le faire
+        //les uis doivent tourner sur le thread ui, on utilise cette méthode pour le faire
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast alert = Toast.makeText(activity,text,Toast.LENGTH_SHORT); //Activity hérite de context
