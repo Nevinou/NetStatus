@@ -15,12 +15,22 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class DetailsActivity extends AppCompatActivity {
-
+    String status,urlApi,serviceName;
+    DetailsActivity (String status, String urlApi, String serviceName){
+        this.status = status;
+        this.urlApi = urlApi;
+        this.serviceName = serviceName;
+        initGeneralStatus();
+    }
+    void initGeneralStatus (){
+        TextView statusGlobal = findViewById(R.id.global_status);
+        statusGlobal.setText((CharSequence) status);
+    }
     void init(){
         Intent datas = getIntent();
-
+        DetailsActivity service = new DetailsActivity(datas.getStringExtra("status"),datas.getStringExtra("LienAPI"),datas.getStringExtra("serviceName"));
         TextView title = findViewById(R.id.nomService);
-        title.setText(datas.getStringExtra("serviceName"));
+        title.setText(service.serviceName);
 
         // Création du boutons pour revenir en arrière
         FloatingActionButton back = findViewById(R.id.retour);
@@ -31,9 +41,8 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        String urlApi = datas.getStringExtra("LienAPI");
-        Thread thread = new Thread(new LoadApiDetail(this,urlApi));
-        thread.start();
+        //Thread thread = new Thread(new LoadApiDetail(this,urlApi));
+        //thread.start();
 
     }
 

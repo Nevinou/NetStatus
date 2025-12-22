@@ -65,6 +65,7 @@ public class LoadApiDetail implements Runnable{
         String status = "";
         try {
             JSONObject stat = json.getJSONObject("status");
+            Log.d("test","Trace 3 : \n Json Status : "+stat);
             switch (stat.getString("indicator")) {
                 case "none":
                     status = activity.getString(R.string.oper); //récupération du string du fichier xml
@@ -88,17 +89,23 @@ public class LoadApiDetail implements Runnable{
         } catch (JSONException e) {
             Log.w("test","test");
         }
-        TextView statusGlobal = activity.findViewById(R.id.txt_global_status);
-        statusGlobal.setText(status);
+        Log.d("test","Trace 4 : Status "+status);
+        TextView statusGlobal = activity.findViewById(R.id.global_status);
+        Log.d("test","Trace 5 : Status : "+status);
+        statusGlobal.setText((CharSequence) status);
         Log.d("Test",status);
 
     }
     @Override
     public void run() {
+        Log.w("test","Trace 1");
         JSONObject json = requeteApiSum();
+        Log.d("test","Trace 2 \n Json : "+json);
         //txt_global_status
-        //TextView statusGlobal = activity.findViewById(R.id.txt_global_status);
-        //statusGlobal.setText("Bleu");
-        modifStatusGlobal(json);
+        TextView statusGlobal = activity.findViewById(R.id.global_status);
+        statusGlobal.setText("Bleu");
+        //modifStatusGlobal(json);
+
+
     }
 }
