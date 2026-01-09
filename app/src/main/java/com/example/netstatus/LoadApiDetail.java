@@ -88,9 +88,9 @@ public class LoadApiDetail implements Runnable{
         } catch (JSONException e) {
             Log.w("test","test");
         }
-        TextView statusGlobal = activity.findViewById(R.id.txt_global_status);
+        TextView statusGlobal = activity.findViewById(R.id.global_status);
         statusGlobal.setText(status);
-        Log.d("Test",status);
+        //Log.d("Test",status);
 
     }
     @Override

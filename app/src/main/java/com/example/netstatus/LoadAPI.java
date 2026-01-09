@@ -93,7 +93,6 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                         //on met un extra de donnée
                         intent.putExtra("LienAPI",site);
                         intent.putExtra("serviceName",serviceName);
-                        intent.putExtra("status",status);
                         activity.startActivity(intent); //on affiche l'activity
                     }
                 });
