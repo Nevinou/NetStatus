@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -14,7 +15,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.HashMap;
+
 public class DetailsActivity extends AppCompatActivity {
+    final HashMap<String,String> dicoSatus = new HashMap<>();
     String status,urlApi,serviceName;
     DetailsActivity (String status, String urlApi, String serviceName){
         this.status = status;
@@ -22,13 +26,22 @@ public class DetailsActivity extends AppCompatActivity {
         this.serviceName = serviceName;
         initGeneralStatus();
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return serviceName + " | "+urlApi+" | Status : "+status;
+    }
+
     void initGeneralStatus (){
         TextView statusGlobal = findViewById(R.id.global_status);
         statusGlobal.setText((CharSequence) status);
     }
     void init(){
         Intent datas = getIntent();
+        Log.d("test","trace 1");
         DetailsActivity service = new DetailsActivity(datas.getStringExtra("status"),datas.getStringExtra("LienAPI"),datas.getStringExtra("serviceName"));
+        Log.d("test",service.toString());
         TextView title = findViewById(R.id.nomService);
         title.setText(service.serviceName);
 
