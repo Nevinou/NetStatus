@@ -1,8 +1,12 @@
 package com.example.netstatus;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 
 import androidx.activity.EdgeToEdge;
@@ -44,7 +48,17 @@ public class AllServicesActivity extends AppCompatActivity {
         apis.add("https://status.epicgames.com");
         apis.add("https://status.scaleway.com");
 
-        Thread thread = new Thread(new LoadAPI(this,apis)); //le réseau doit être fait dans un thread externe
+        List<String> premiers = new ArrayList<String>();
+        for (int i=0;i<10;i++){
+            premiers.add(apis.get(i));
+        }
+        List<String> second = new ArrayList<String>();
+        for (int i=10;i<20;i++){
+            second.add(apis.get(i));
+        }
+        Activity current = this;
+
+        Thread thread = new Thread(new LoadAPI(current,premiers)); //le réseau doit être fait dans un thread externe
         thread.start();
 
         FloatingActionButton back = findViewById(R.id.retour);
@@ -55,7 +69,28 @@ public class AllServicesActivity extends AppCompatActivity {
             }
         });
 
-        SearchView search = findViewById(R.id.search);
+        ScrollView scroll = findViewById(R.id.scroll);
+        scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            long last = 0; // doit être ici, Java n’autorise pas la modification d’une variable locale de la méthode à l’intérieur d’une classe interne anonyme
+            @Override
+            public void onScrollChanged() {
+                LinearLayout layout = findViewById(R.id.main);
+
+                int diff = layout.getBottom() - (scroll.getHeight() + scroll.getScrollY());
+                //diff = distance entre le bas de la frame et le bas visible
+                //getHeight : Retourne la hauteur visible du ScrollView, en pixels
+                //getScrollY : Retourne la distance verticale déjà scrollée depuis le haut, en pixels
+                long time = System.currentTimeMillis(); //temps en ms depuis 1er janvier 1970
+                if (diff <= 0 && (time-last) >= 1000){ //on vérifie que l'on a 1s entre les requetes pour ne pas charger en double car l'event peut s'activer plusieurs fois alors que l'on est en bas
+                    last = time;
+                    Thread thread = new Thread(new LoadAPI(current,second)); //on charge la suite
+                    thread.start();
+                    Log.d("Time","load");
+                }
+            }
+        });
+
+        SearchView search = findViewById(R.id.search); //barre de recherche
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
 
             @Override
