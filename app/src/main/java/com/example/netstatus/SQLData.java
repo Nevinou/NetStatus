@@ -3,11 +3,10 @@ package com.example.netstatus;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import androidx.annotation.Nullable;
+import android.util.Log;
 
 public class SQLData extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 7; //incrémenté = delete tout, refaire les appels d'ajout
     public static final String DATABASE_NAME = "services.db";
 
     public static final String TABLE_NAME = "services";
@@ -15,6 +14,7 @@ public class SQLData extends SQLiteOpenHelper {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_API = "api";
     public static final String COLUMN_IMAGE = "image";
+    public static final String COLUMN_FAVORITE = "favorite";
     public SQLData(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -25,7 +25,8 @@ public class SQLData extends SQLiteOpenHelper {
                 +COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"
                 +COLUMN_NAME+" TEXT,"
                 +COLUMN_API+" TEXT,"
-                +COLUMN_IMAGE+" TEXT"
+                +COLUMN_IMAGE+" TEXT,"
+                +COLUMN_FAVORITE+" INTEGER DEFAULT 0" //boolean existe pas sql lite
                 +")";
         db.execSQL(command);
     }

@@ -58,8 +58,8 @@ public class AllServicesActivity extends AppCompatActivity {
         }
         Activity current = this;
 
-        Thread thread = new Thread(new LoadAPI(current,premiers)); //le réseau doit être fait dans un thread externe
-        thread.start();
+        //Thread thread = new Thread(new LoadAPI(current,premiers)); //le réseau doit être fait dans un thread externe
+        //thread.start();
 
         FloatingActionButton back = findViewById(R.id.retour);
         back.setOnClickListener(new View.OnClickListener() {
@@ -83,8 +83,8 @@ public class AllServicesActivity extends AppCompatActivity {
                 long time = System.currentTimeMillis(); //temps en ms depuis 1er janvier 1970
                 if (diff <= 0 && (time-last) >= 1000){ //on vérifie que l'on a 1s entre les requetes pour ne pas charger en double car l'event peut s'activer plusieurs fois alors que l'on est en bas
                     last = time;
-                    Thread thread = new Thread(new LoadAPI(current,second)); //on charge la suite
-                    thread.start();
+                    //Thread thread = new Thread(new LoadAPI(current,second)); //on charge la suite
+                    //thread.start();
                     Log.d("Time","load");
                 }
             }
