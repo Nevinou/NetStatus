@@ -38,13 +38,23 @@ public class DetailsActivity extends AppCompatActivity {
         // Création du service
         // Récupération de l'objet Title et on set le text avec le nom du service transmis par mainActivity
         Service service =  new Service(datas.getStringExtra("service"));
-        //Log.d("test","trace 1, "+service.toString());
 
+        //
+        // Requètes api et affichage des éléments visuel
+        // Voir méthode run de la class LoadApiDetail
+        //
+        Thread thread = new Thread(new LoadApiDetail(this,service));
+        thread.start();
 
+        //
+        // Ajout du titre
+        //
         TextView title = findViewById(R.id.nomService);
         title.setText(service.getName());
-        //title.setText(datas.getStringExtra("serviceName"));
-        Log.d("test","Trace refresh 1");
+
+        //
+        // Création des Boutons
+        //
         // Création du boutons pour revenir en arrière
         FloatingActionButton back = findViewById(R.id.retour);
         back.setOnClickListener(new View.OnClickListener() {
@@ -53,10 +63,7 @@ public class DetailsActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        Log.d("test","Trace refresh 2");
-
-        // Création du boutons d'actualisation problème de crash
+        // Création du boutons d'actualisation
         ImageButton refresh = findViewById(R.id.actualliser);
         refresh.setOnClickListener(
                 new View.OnClickListener() {
@@ -66,9 +73,6 @@ public class DetailsActivity extends AppCompatActivity {
                     }
                 }
         );
-
-        //Thread thread = new Thread(new LoadApiDetail(this,urlApi));
-        //thread.start();
 
     }
 
