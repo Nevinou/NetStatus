@@ -35,11 +35,12 @@ public class DetailsActivity extends AppCompatActivity {
     }
     void init(){
         Intent datas = getIntent();
-        Service service =  new Service(datas.getStringExtra("service"));
-        //Service service = new Service(datas.getStringExtra('name'),datas.getData());
-        Log.d("test","trace 1, "+service.toString());
-
+        // Création du service
         // Récupération de l'objet Title et on set le text avec le nom du service transmis par mainActivity
+        Service service =  new Service(datas.getStringExtra("service"));
+        //Log.d("test","trace 1, "+service.toString());
+
+
         TextView title = findViewById(R.id.nomService);
         title.setText(service.getName());
         //title.setText(datas.getStringExtra("serviceName"));

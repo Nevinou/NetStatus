@@ -140,7 +140,8 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
 
                         InputStream inputImage = new URL(service.getImage()).openStream(); // vu que la méthode setImageURI
                         // de l'imageView ne prend que des URI locaux, il faut download l'image depuis internet en bitmap
-                        Bitmap bitMapImage = BitmapFactory.decodeStream(inputImage); //on transforme l'image en bitmap
+                        //on transforme l'image en bitmap
+                        Bitmap bitMapImage = BitmapFactory.decodeStream(inputImage);
 
                         createCard(json,service,bitMapImage); //appel methode
                     } catch (MalformedURLException e) {

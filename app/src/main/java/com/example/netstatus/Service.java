@@ -1,5 +1,8 @@
 package com.example.netstatus;
 
+import android.app.Activity;
+
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Service {
@@ -14,7 +17,10 @@ public class Service {
         this.image = image;
         this.favorite = favorite;
     }
+
     Service(String serviceCsv){
+        // Créer un service grâce à avec un string de la forme
+        // "{name};{api};{image};{favorite}"
         StringTokenizer st = new StringTokenizer(serviceCsv,";");
         name = st.nextToken();
         api = st.nextToken();
@@ -43,5 +49,38 @@ public class Service {
     }
     public boolean getFavorite(){
         return favorite;
+    }
+
+    static String status(String indicator, Activity activity){
+        String status;
+        int color;
+        switch (indicator) {
+            case "none":
+                //récupération du string du fichier xml
+                status = activity.getString(R.string.oper);
+                color = activity.getColor(R.color.oper);
+                break;
+            case "minor":
+                status = activity.getString(R.string.warn);
+                color = activity.getColor(R.color.warn);
+                break;
+            case "major":
+                status = activity.getString(R.string.broken);
+                color = activity.getColor(R.color.broken);
+                break;
+            case "critical":
+                status = activity.getString(R.string.hard_broken);
+                color = activity.getColor(R.color.hard_broken);
+                break;
+            case "maintenance":
+                status = activity.getString(R.string.disabled);
+                color = activity.getColor(R.color.disabled);
+                break;
+            default:
+                status = activity.getString(R.string.unknown);
+                color = activity.getColor(R.color.unknown);
+                break;
+        }
+        return status+";"+color;
     }
 }
