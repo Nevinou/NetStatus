@@ -2,10 +2,11 @@ package com.example.netstatus;
 
 import android.app.Activity;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class Service {
+public class Service implements Serializable {
     private String name;
     private String api;
     private String image;

@@ -1,6 +1,7 @@
 package com.example.netstatus;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,45 +22,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AllServicesActivity extends AppCompatActivity {
-    List<String> apis;
-    void init(){
-        apis = new ArrayList<String>();
-        apis.add("https://discordstatus.com");
-        apis.add("https://www.githubstatus.com");
-        apis.add("https://www.cloudflarestatus.com");
-        apis.add("https://www.redditstatus.com");
-        apis.add("https://status.atlassian.com");
-        apis.add("https://shopify.statuspage.io");
-        apis.add("https://status.digitalocean.com");
-        apis.add("https://status.dropbox.com");
-        apis.add("https://status.twilio.com");
-        apis.add("https://status.newrelic.com");
-        apis.add("https://status.aweber.com");
-        apis.add("https://status.duo.com");
-        apis.add("https://status.librato.com");
-        apis.add("https://status.coinbase.com");
-        apis.add("https://status.iadvize.com");
-        apis.add("https://status.searchspring.com");
-        apis.add("https://status.opentext.com");
-        apis.add("https://status.mindbodyonline.com");
-        apis.add("https://status.stitchdata.com");
-        apis.add("https://alerts.library.nyu.edu");
-        apis.add("https://status.developer.intuit.com");
-        apis.add("https://status.epicgames.com");
-        apis.add("https://status.scaleway.com");
+    List<Service> services;
+    int count;
+    final int increment = 10;
 
-        List<String> premiers = new ArrayList<String>();
-        for (int i=0;i<10;i++){
-            premiers.add(apis.get(i));
+    List<Service> loadMore(){
+        List<Service> next = new ArrayList<Service>();
+        for (int i=count-increment;i<count;i++){
+            if (i<services.size()){
+                next.add(services.get(i));
+            }
         }
-        List<String> second = new ArrayList<String>();
-        for (int i=10;i<20;i++){
-            second.add(apis.get(i));
+        return next;
+    }
+
+    void filterServices(String text) {
+        LinearLayout layout = findViewById(R.id.main);
+        List<Service> toLoad = new ArrayList<Service>();
+
+        layout.removeAllViews();
+        for (Service elem : services) {
+            if (elem.getName().toLowerCase().contains(text.toLowerCase())) {
+                toLoad.add(elem);
+            }
         }
+        Thread thread = new Thread(new LoadAPI(this,toLoad)); //on charge la suite
+        thread.start();
+    }
+    void init(){;
+        Intent intent = getIntent();
+        services = (ArrayList<Service>) intent.getSerializableExtra("allServices");
+        count = 10;
+
+        List<Service> mustLoad = loadMore();
         Activity current = this;
 
-        //Thread thread = new Thread(new LoadAPI(current,premiers)); //le réseau doit être fait dans un thread externe
-        //thread.start();
+        Thread thread = new Thread(new LoadAPI(current,mustLoad)); //le réseau doit être fait dans un thread externe
+        thread.start();
 
         FloatingActionButton back = findViewById(R.id.retour);
         back.setOnClickListener(new View.OnClickListener() {
@@ -83,25 +82,39 @@ public class AllServicesActivity extends AppCompatActivity {
                 long time = System.currentTimeMillis(); //temps en ms depuis 1er janvier 1970
                 if (diff <= 0 && (time-last) >= 1000){ //on vérifie que l'on a 1s entre les requetes pour ne pas charger en double car l'event peut s'activer plusieurs fois alors que l'on est en bas
                     last = time;
-                    //Thread thread = new Thread(new LoadAPI(current,second)); //on charge la suite
-                    //thread.start();
-                    Log.d("Time","load");
+                    count += increment;
+                    List<Service> mustLoad = loadMore();
+                    Thread thread = new Thread(new LoadAPI(current,mustLoad)); //on charge la suite
+                    thread.start();
+                    //Log.d("Time","load");
                 }
             }
         });
 
         SearchView search = findViewById(R.id.search); //barre de recherche
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+            long last = 0;
 
             @Override
             public boolean onQueryTextChange(String newText) { //appuit sur une touche
-                return false;
+                if (newText.equals("")){
+                    count = 10;
+                    List<Service> mustLoad = loadMore();
+                    Thread thread = new Thread(new LoadAPI(current,mustLoad));
+                    thread.start();
+                }
+                return true;
             }
 
             @Override
-            public boolean onQueryTextSubmit(String query) { //recherche
-                //clear la view, inflate des nouvelles cards qui matchent
-                return false;
+            public boolean onQueryTextSubmit(String query) {
+                long time = System.currentTimeMillis(); //temps en ms depuis 1er janvier 1970
+                if ((time-last) < 1000){
+                    return true;
+                }
+                last = time;
+                filterServices(query);
+                return true;
             }
         });
     }

@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de run
     Activity activity;
@@ -45,33 +46,10 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                     JSONObject data = json.getJSONObject("page"); //récupération json page, dans le futur, utilisé pour afficher l'heure d'update
                     JSONObject stat = json.getJSONObject("status"); //récupération du status json
                     serviceName = service.getName();
-
-                    switch (stat.getString("indicator")) {
-                        case "none":
-                            status = activity.getString(R.string.oper); //récupération du string du fichier xml
-                            color = activity.getColor(R.color.oper);
-                            break;
-                        case "minor":
-                            status = activity.getString(R.string.warn);
-                            color = activity.getColor(R.color.warn);
-                            break;
-                        case "major":
-                            status = activity.getString(R.string.broken);
-                            color = activity.getColor(R.color.broken);
-                            break;
-                        case "critical":
-                            status = activity.getString(R.string.hard_broken);
-                            color = activity.getColor(R.color.hard_broken);
-                            break;
-                        case "maintenance":
-                            status = activity.getString(R.string.disabled);
-                            color = activity.getColor(R.color.disabled);
-                            break;
-                        default:
-                            status = activity.getString(R.string.unknown);
-                            color = activity.getColor(R.color.unknown);
-                            break;
-                    }
+                    String result = Service.status(stat.getString("indicator"),activity);
+                    StringTokenizer tokenizer = new StringTokenizer(result,";");
+                    status = tokenizer.nextToken();
+                    color = Integer.parseInt(tokenizer.nextToken());
                 } catch (JSONException e) {
                     displayAlert("Erreur JSON, récupération de la page"); //affichage alerte
                     return; //on execute pas le reste
@@ -98,7 +76,7 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                         //création d'un itent vers Details
                         Intent intent = new Intent(activity,DetailsActivity.class);
                         // Envoie le service à la page détail Activity
-                        intent.putExtra("service", service.toCsv());
+                        intent.putExtra("service", service);
 
                         activity.startActivity(intent); //on affiche l'activity
                     }

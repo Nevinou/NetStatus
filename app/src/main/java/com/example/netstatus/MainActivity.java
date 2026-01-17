@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //on fait un itent pour changer de page
                 Intent intent = new Intent(MainActivity.this,AllServicesActivity.class);
+                intent.putExtra("allServices", (ArrayList<Service>)services);
                 startActivity(intent); //on change d'activity
             }
         });
