@@ -1,7 +1,10 @@
 package com.example.netstatus;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -10,95 +13,59 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class LoadApiDetail implements Runnable{
+public class LoadApiDetail  implements Runnable{
     Activity activity;
-    String urlApi;
+    Service service;
 
     // Constructeur
-    LoadApiDetail (Activity activity, String urlApi){
+    LoadApiDetail (Activity activity, Service urlApi){
         this.activity = activity;
-        this.urlApi = urlApi;
+        this.service = urlApi;
     }
-    void displayAlert(String text){
-        //les uis doivent tourner sur le thread ui, on utilise cette méthode pour le faire
+    void addLogo (Bitmap logo){
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast alert = Toast.makeText(activity,text,Toast.LENGTH_SHORT); //Activity hérite de context
-                alert.show(); //on affiche le Toast
+                ImageView image = activity.findViewById(R.id.logo);
+                image.setImageBitmap(logo);
             }
         });
     }
-
-    JSONObject requeteApiSum (){
-        JSONObject json;
-        try {
-
-            URL url = new URL(urlApi + "/api/v2/summary.json"); //création url
-            URLConnection conn = url.openConnection(); //ajouter la permission internet dans le manifest ! Ouverture de la connexion
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); // Flux de lecture
-            String total = "";
-            String line;
-            while ((line = reader.readLine()) != null) {
-                total += line; //lecture de toute les lignes
-            }
-            reader.close();
-            //Log.d("test",total);
-            json = new JSONObject(total); //création d'un JSONObject
-            return json;
-        } catch (MalformedURLException e) {
-            displayAlert("Mauvaise URL");
-        } catch (JSONException e) {
-            displayAlert("Erreur JSON");
-        } catch (IOException e) {
-            displayAlert("Erreur de donnée pour un service");
-        }
-        return new JSONObject();
+    Bitmap loadLogo () throws MalformedURLException, IOException{
+        Bitmap logo;
+        // vu que la méthode setImageURI
+        InputStream inputImage = new URL(service.getImage()).openStream();
+        // de l'imageView ne prend que des URI locaux,
+        // il faut download l'image depuis internet en bitmap
+        // on transforme l'image en bitmap
+        logo = BitmapFactory.decodeStream(inputImage);
+        return logo;
     }
 
-    void modifStatusGlobal (JSONObject json){
-        String status = "";
-        try {
-            JSONObject stat = json.getJSONObject("status");
-            switch (stat.getString("indicator")) {
-                case "none":
-                    status = activity.getString(R.string.oper); //récupération du string du fichier xml
-                    break;
-                case "minor":
-                    status = activity.getString(R.string.warn);
-                    break;
-                case "major":
-                    status = activity.getString(R.string.broken);
-                    break;
-                case "critical":
-                    status = activity.getString(R.string.hard_broken);
-                    break;
-                case "maintenance":
-                    status = activity.getString(R.string.disabled);
-                    break;
-                default:
-                    status = activity.getString(R.string.unknown);
-                    break;
-            }
-        } catch (JSONException e) {
-            Log.w("test","test");
-        }
-        TextView statusGlobal = activity.findViewById(R.id.global_status);
-        statusGlobal.setText(status);
-        //Log.d("Test",status);
 
-    }
     @Override
     public void run() {
-        JSONObject json = requeteApiSum();
-        //txt_global_status
-        //TextView statusGlobal = activity.findViewById(R.id.txt_global_status);
-        //statusGlobal.setText("Bleu");
-        modifStatusGlobal(json);
+        //
+        // Requête Image
+        //
+        Bitmap logo;
+        try {
+            logo = loadLogo();
+            addLogo(logo);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
     }
 }
