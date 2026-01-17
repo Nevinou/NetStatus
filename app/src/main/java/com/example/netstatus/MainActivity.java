@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
     void init(){
         SQLGestion gestionnaire = new SQLGestion(this); //création objet db
         //images en SVG ne chargent pas !
-//        gestionnaire.addService("Discord","https://discordstatus.com","https://pngimg.com/d/discord_PNG3.png");
 //        gestionnaire.addService("GitHub","https://www.githubstatus.com","https://icones.pro/wp-content/uploads/2021/06/icone-github-noir.png");
+//        gestionnaire.addService("Discord","https://discordstatus.com","https://pngimg.com/d/discord_PNG3.png");
 //        gestionnaire.addService("Cloudflare","https://www.cloudflarestatus.com","https://boostmypresta.com/109-large_default/configuration-cloudflare.jpg");
 //        gestionnaire.addService("Reddit","https://www.redditstatus.com","https://upload.wikimedia.org/wikipedia/en/thumb/b/bd/Reddit_Logo_Icon.svg/250px-Reddit_Logo_Icon.svg.png");
 //        gestionnaire.addService("Atlassian","https://status.atlassian.com","https://miro.medium.com/1*XBjByL76rrguN7qEqd1KzA.jpeg");

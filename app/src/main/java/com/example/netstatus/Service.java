@@ -1,5 +1,7 @@
 package com.example.netstatus;
 
+import java.util.StringTokenizer;
+
 public class Service {
     private String name;
     private String api;
@@ -12,9 +14,20 @@ public class Service {
         this.image = image;
         this.favorite = favorite;
     }
+    Service(String serviceCsv){
+        StringTokenizer st = new StringTokenizer(serviceCsv,";");
+        name = st.nextToken();
+        api = st.nextToken();
+        image = st.nextToken();
+        favorite = Boolean.parseBoolean(st.nextToken());
+    }
 
     public String toString(){
         return "Application "+name+" avec comme api "+api+" et comme image "+image+" favori : "+favorite;
+    }
+
+    String toCsv (){
+        return name+";"+api+";"+image+";"+favorite;
     }
 
     public String getName() {

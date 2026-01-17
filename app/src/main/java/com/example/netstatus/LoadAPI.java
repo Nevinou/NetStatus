@@ -97,9 +97,9 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                     public void onClick(View v) {
                         //création d'un itent vers Details
                         Intent intent = new Intent(activity,DetailsActivity.class);
-                        //on met un extra de donnée
-                        intent.putExtra("LienAPI",service.getName()); //a changer par la variable service pour avoir l'image etc
-                        intent.putExtra("serviceName",serviceName); //to delete
+                        // Envoie le service à la page détail Activity
+                        intent.putExtra("service", service.toCsv());
+
                         activity.startActivity(intent); //on affiche l'activity
                     }
                 });

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -34,11 +35,14 @@ public class DetailsActivity extends AppCompatActivity {
     }
     void init(){
         Intent datas = getIntent();
-        Log.d("test","trace 1, ");
+        Service service =  new Service(datas.getStringExtra("service"));
+        //Service service = new Service(datas.getStringExtra('name'),datas.getData());
+        Log.d("test","trace 1, "+service.toString());
 
         // Récupération de l'objet Title et on set le text avec le nom du service transmis par mainActivity
         TextView title = findViewById(R.id.nomService);
-        title.setText(datas.getStringExtra("serviceName"));
+        title.setText(service.getName());
+        //title.setText(datas.getStringExtra("serviceName"));
         Log.d("test","Trace refresh 1");
         // Création du boutons pour revenir en arrière
         FloatingActionButton back = findViewById(R.id.retour);
@@ -52,7 +56,7 @@ public class DetailsActivity extends AppCompatActivity {
         Log.d("test","Trace refresh 2");
 
         // Création du boutons d'actualisation problème de crash
-        FloatingActionButton refresh = findViewById(R.id.actualliser);
+        ImageButton refresh = findViewById(R.id.actualliser);
         refresh.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
