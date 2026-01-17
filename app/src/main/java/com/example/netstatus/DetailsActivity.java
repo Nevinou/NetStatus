@@ -37,7 +37,7 @@ public class DetailsActivity extends AppCompatActivity {
         Intent datas = getIntent();
         // Création du service
         // Récupération de l'objet Title et on set le text avec le nom du service transmis par mainActivity
-        Service service =  new Service(datas.getStringExtra("service"));
+        Service service =  (Service) datas.getSerializableExtra("service");
 
         //
         // Requètes api et affichage des éléments visuel

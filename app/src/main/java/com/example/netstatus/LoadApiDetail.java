@@ -48,6 +48,39 @@ public class LoadApiDetail  implements Runnable{
         return logo;
     }
 
+    JSONObject loadJson (String path ){
+        JSONObject json;
+        try {
+            URL url = new URL(service.getApi() + "/api/v2/"+path); //création url
+            URLConnection conn = url.openConnection(); //ajouter la permission internet dans le manifest ! Ouverture de la connexion
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); // Flux de lecture
+            String pageWeb = "";
+            String line;
+            while ((line = reader.readLine()) != null) {
+                pageWeb += line; //lecture de toute les lignes
+            }
+            reader.close();
+            //Log.d("JSON",total);
+            json = new JSONObject(pageWeb); //création d'un JSONObject
+        } catch (Exception e) {
+            json = null;
+        }
+        return json;
+    }
+
+    String extractGeneralStatus (JSONObject status){
+        String generalStatus = "";
+        try {
+            JSONObject data = status.getJSONObject("page");
+            JSONObject stat = status.getJSONObject("status");
+            Log.d("Trace 1 ", ""+stat);
+        } catch (JSONException e){
+            return "Inconnue";
+        }
+
+
+        return generalStatus;
+    }
 
     @Override
     public void run() {
@@ -57,12 +90,21 @@ public class LoadApiDetail  implements Runnable{
         Bitmap logo;
         try {
             logo = loadLogo();
+            // Ajout du log sur l'interface graphique
             addLogo(logo);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //
+        // Requête Status Général
+        //
+        JSONObject status = loadJson("status.json");
+        String generalStatus = extractGeneralStatus(status);
+
+
 
 
 
