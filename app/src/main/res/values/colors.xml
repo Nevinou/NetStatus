@@ -15,14 +15,14 @@
     <!-- Activity Details -->
     <!-- Couleur Status-->
     <color name="status_operational">#10B981</color>
-    <color name="status_mineur">#10B981</color>
+    <color name="status_mineur">#FFC107</color>
     <color name="status_majeur">#FF6B00</color>
     <color name="status_critique">#DC2626</color>
     <color name="status_maintenance">#3B82F6</color>
     <color name="status_inconnu">#6B7280</color>
 
     <!-- Couleurs de fond (bg) -->
-    <color name="status_operational_bg">#D1FAE5</color>
+    <color name="status_operational_bg">#ECFDF5</color>
     <color name="status_mineur_bg">#FEF3C7</color>
     <color name="status_majeur_bg">#FFEDD5</color>
     <color name="status_critique_bg">#FEE2E2</color>

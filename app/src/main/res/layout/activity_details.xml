@@ -6,131 +6,196 @@
     android:layout_height="match_parent"
     android:background="#FAFAFA">
 
-    <ScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:orientation="vertical">
 
+        <!-- Entète avec le nom du service -->
         <LinearLayout
-            android:id="@+id/main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+            <!--android:layout_marginBottom="24dp">-->
 
-
+            <!-- entète avec le nom et le bouton pour refresh-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
+                android:gravity="center_vertical">
+                <!-- Logo -->
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@mipmap/ic_launcher"
+                    android:padding="8dp"
+                    android:contentDescription="@string/app_icon"/>
 
-                <!-- entète avec le nom et le bouton pour refresh-->
-                <LinearLayout
-                    android:layout_width="match_parent"
+
+                <!-- Nom-->
+
+                <TextView
+                    android:id="@+id/nomService"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-                    <!-- Logo -->
-                    <ImageView
-                        android:id="@+id/logo"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:padding="8dp"
-                        android:contentDescription="@string/app_icon"/>
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:text="Name"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-                    <!-- Nom-->
-                    <TextView
-                        android:id="@+id/nomService"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:gravity="center_horizontal"
-                        android:text="Name"
-                        android:textColor="@color/black"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-                    <!-- Bouton refresh -->
-                    <ImageButton
-                        android:id="@+id/actualliser"
-                        android:layout_width="49dp"
-                        android:layout_height="48dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/refresh"
-                        android:src="@drawable/ic_refresh" />
-
-                </LinearLayout>
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+                <!-- Bouton refresh -->
+                <ImageButton
+                    android:id="@+id/actualliser"
+                    android:layout_width="49dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/refresh"
+                    android:src="@drawable/ic_refresh" />
 
             </LinearLayout>
-            
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_global_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/status_operational_bg"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/status_operational"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:id="@+id/img_global_status_icon"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="@string/status_icon"
-                        app:tint="@color/status_operational" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="12dp">
-
-                        <TextView
-                            android:id="@+id/global_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/txt_last_update"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/last_update"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_secondary"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
-    </ScrollView>
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+
+            <LinearLayout
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="1dp">
+
+                <!-- Status Générale -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_global_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="2dp"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Titre partie -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/geneStatus"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F2937"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:id="@+id/statusGeneralBG"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@color/status_inconnu_bg"
+                            android:padding="12dp"
+                            android:layout_marginTop="4dp">
+
+                            <View
+                                android:id="@+id/statusIndicator"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:background="@drawable/circle_shape"
+                                android:backgroundTint="@color/status_inconnu" />
+
+                            <TextView
+                                android:id="@+id/statusText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Statut Inconnue"
+                                android:textSize="16sp"
+                                android:textColor="@color/status_inconnu"
+                                android:textStyle="bold"
+                                android:layout_marginStart="12dp" />
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"/>
+                            <TextView
+                                android:id="@+id/textClock"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:textColor="@android:color/black"
+                                />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!--<LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/img_global_status_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_check_circle"
+                            android:contentDescription="@string/status_icon"
+                            app:tint="@color/status_operational" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:id="@+id/global_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black" />
+
+                            <TextView
+                                android:id="@+id/txt_last_update"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/last_update"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>-->
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/retour"

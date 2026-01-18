@@ -21,6 +21,7 @@
     <string name="refresh">rafréchir</string>
     <string name="status_icon">Icon Status</string>
     <string name="last_update">Dernière mise à jour : </string>
+    <string name="geneStatus">Statut Générale</string>
 
 
 </resources>

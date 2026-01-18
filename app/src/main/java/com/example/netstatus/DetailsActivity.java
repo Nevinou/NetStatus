@@ -29,10 +29,7 @@ public class DetailsActivity extends AppCompatActivity {
         return serviceName + " | "+urlApi+" | Status : "+status;
     }
 
-    void initGeneralStatus (){
-        TextView statusGlobal = findViewById(R.id.global_status);
-        statusGlobal.setText((CharSequence) status);
-    }
+
     void init(){
         Intent datas = getIntent();
         // Création du service
@@ -45,6 +42,9 @@ public class DetailsActivity extends AppCompatActivity {
         //
         Thread thread = new Thread(new LoadApiDetail(this,service));
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) { }
 
         //
         // Ajout du titre

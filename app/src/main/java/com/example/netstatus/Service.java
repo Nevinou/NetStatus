@@ -54,34 +54,40 @@ public class Service implements Serializable {
 
     static String status(String indicator, Activity activity){
         String status;
-        int color;
+        int color,colorBg;
         switch (indicator) {
             case "none":
                 //récupération du string du fichier xml
                 status = activity.getString(R.string.oper);
                 color = activity.getColor(R.color.oper);
+                colorBg = activity.getColor(R.color.status_operational_bg);
                 break;
             case "minor":
                 status = activity.getString(R.string.warn);
                 color = activity.getColor(R.color.warn);
+                colorBg = activity.getColor(R.color.status_mineur_bg);
                 break;
             case "major":
                 status = activity.getString(R.string.broken);
                 color = activity.getColor(R.color.broken);
+                colorBg = activity.getColor(R.color.status_majeur_bg);
                 break;
             case "critical":
                 status = activity.getString(R.string.hard_broken);
                 color = activity.getColor(R.color.hard_broken);
+                colorBg = activity.getColor(R.color.status_critique_bg);
                 break;
             case "maintenance":
                 status = activity.getString(R.string.disabled);
                 color = activity.getColor(R.color.disabled);
+                colorBg = activity.getColor(R.color.status_maintenance_bg);
                 break;
             default:
                 status = activity.getString(R.string.unknown);
                 color = activity.getColor(R.color.unknown);
+                colorBg = activity.getColor(R.color.status_inconnu_bg);
                 break;
         }
-        return status+";"+color;
+        return status+";"+color+";"+colorBg;
     }
 }

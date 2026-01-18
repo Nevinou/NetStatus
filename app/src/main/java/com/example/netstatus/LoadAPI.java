@@ -63,6 +63,7 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
 
                 TextView titre = card.findViewById(R.id.titre); //récupération du titre de la card
                 titre.setText(serviceName); //on définit un texte
+
                 TextView serviceStatus = card.findViewById(R.id.status);
                 serviceStatus.setText(activity.getText(R.string.string_status)+" "+status); //on concatène "status :" avec le stauts actuel
                 serviceStatus.setTextColor(color);

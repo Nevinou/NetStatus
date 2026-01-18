@@ -1,10 +1,16 @@
 package com.example.netstatus;
 
+import static android.view.View.VISIBLE;
+
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +24,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.StringTokenizer;
 
 public class LoadApiDetail  implements Runnable{
     Activity activity;
@@ -37,6 +46,50 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
+    String extractHour (JSONObject json){
+        String hour;
+        try {
+            String input = json.getJSONObject("page").getString("updated_at");
+
+            // Parser la chaîne ISO 8601 en OffsetDateTime
+            OffsetDateTime odt = OffsetDateTime.parse(input);
+
+            // Formatter en hh:mm (12h)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
+            hour = odt.format(formatter);
+        } catch (JSONException e) {
+            hour = "--:--";
+        }
+
+        return hour;
+    }
+
+    void addGeneralStatus (String statusCouleur, String hour) throws NumberFormatException{
+        StringTokenizer st = new StringTokenizer(statusCouleur,";");
+        String status = st.nextToken();
+        int color = Integer.parseInt(st.nextToken());
+        int colorBg = Integer.parseInt(st.nextToken());
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Modification du texte et de la couleur
+                TextView textStatus = activity.findViewById(R.id.statusText);
+                textStatus.setText(status);
+                textStatus.setTextColor(color);
+                View indicator = activity.findViewById(R.id.statusIndicator);
+                indicator.setBackgroundTintList(ColorStateList.valueOf(color));
+                // Couleur background
+                LinearLayout bg = activity.findViewById(R.id.statusGeneralBG);
+                bg.setBackgroundColor(colorBg);
+                // Horloge
+                TextView clock = activity.findViewById(R.id.textClock);
+                clock.setText(hour);
+                clock.setTextColor(color);
+
+            }
+        });
+    }
     Bitmap loadLogo () throws MalformedURLException, IOException{
         Bitmap logo;
         // vu que la méthode setImageURI
@@ -48,7 +101,7 @@ public class LoadApiDetail  implements Runnable{
         return logo;
     }
 
-    JSONObject loadJson (String path ){
+    JSONObject loadJson (String path){
         JSONObject json;
         try {
             URL url = new URL(service.getApi() + "/api/v2/"+path); //création url
@@ -68,17 +121,14 @@ public class LoadApiDetail  implements Runnable{
         return json;
     }
 
-    String extractGeneralStatus (JSONObject status){
+    String extractGeneralStatus (JSONObject json){
         String generalStatus = "";
         try {
-            JSONObject data = status.getJSONObject("page");
-            JSONObject stat = status.getJSONObject("status");
-            Log.d("Trace 1 ", ""+stat);
+            JSONObject stat = json.getJSONObject("status");
+            generalStatus = stat.getString("indicator");
         } catch (JSONException e){
             return "Inconnue";
         }
-
-
         return generalStatus;
     }
 
@@ -99,10 +149,18 @@ public class LoadApiDetail  implements Runnable{
         }
 
         //
+        // Récupération du json de l'api et mise dans les différentes variables
+        //
+        JSONObject json = loadJson("summary.json");
+        Log.d("test",json.toString());
+        //
         // Requête Status Général
         //
-        JSONObject status = loadJson("status.json");
-        String generalStatus = extractGeneralStatus(status);
+        String generalStatus = extractGeneralStatus(json);
+        //Log.d("test","trace 1" + generalStatus);
+        addGeneralStatus(Service.status(generalStatus,activity),extractHour(json));
+
+
 
 
 
