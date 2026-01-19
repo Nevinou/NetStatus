@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.StringTokenizer;
@@ -77,13 +78,16 @@ public class LoadApiDetail  implements Runnable{
         String impact;
         try {
             name = incident.getString("name");
-            impact = incident.getString("impact");
+            StringTokenizer st = new StringTokenizer(Service.status(incident.getString("impact"),activity),";");
+            impact = st.nextToken();
         } catch (JSONException e ){
             name = activity.getString(R.string.unknown);
             impact = activity.getString(R.string.unknown);
         }
         String finalName = name;
+
         String finalImpact = impact;
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -101,6 +105,7 @@ public class LoadApiDetail  implements Runnable{
                 // Ajout de l'impact
                 TextView impactTextView = templatePb.findViewById(R.id.impact);
                 impactTextView.setText(finalImpact);
+                Log.d("test",finalImpact);
 
                 // AJout du template à l'activity
                 cardPb.addView(templatePb);
@@ -108,44 +113,51 @@ public class LoadApiDetail  implements Runnable{
         });
     }
     String extractHour(JSONObject json){
-        String hour;
+        String delta;
         try {
             String input = json.getString("updated_at");
-
-            // Parser la chaîne ISO 8601 en OffsetDateTime
             OffsetDateTime odt = OffsetDateTime.parse(input);
+            OffsetDateTime now = OffsetDateTime.now();
+            Duration duration = Duration.between(odt,now);
 
-            // Formatter en hh:mm (12h)
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
-            hour = odt.format(formatter);
+            delta = "Il y a "+duration.toHours()+" h";
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
+            //hour = odt.format(formatter);
         } catch (JSONException e) {
-            hour = "--:--";
+            delta = "Il y a -- h";
         }
 
-        return hour;
+        return delta;
     }
-    String extractHour (JSONObject json,String name){
-        String hour;
+    long extractHour (JSONObject json,String name){
+        long delta;
         try {
             String input = json.getJSONObject(name).getString("updated_at");
-
-            // Parser la chaîne ISO 8601 en OffsetDateTime
             OffsetDateTime odt = OffsetDateTime.parse(input);
+            OffsetDateTime now = OffsetDateTime.now();
+            Duration duration = Duration.between(odt,now);
 
-            // Formatter en hh:mm (12h)
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
-            hour = odt.format(formatter);
+            delta = duration.toHours();
+            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
+            //hour = odt.format(formatter);
         } catch (JSONException e) {
-            hour = "--:--";
+            delta = -1;
         }
 
-        return hour;
+        return delta;
     }
-    void addGeneralStatus (String statusCouleur, String hour) throws NumberFormatException{
+    void addGeneralStatus (String statusCouleur, JSONObject json) throws NumberFormatException{
         StringTokenizer st = new StringTokenizer(statusCouleur,";");
         String status = st.nextToken();
         int color = Integer.parseInt(st.nextToken());
         int colorBg = Integer.parseInt(st.nextToken());
+        String hour;
+        try {
+            hour = extractHour(json.getJSONObject("page"));
+        } catch (JSONException e) {
+            hour = "Il y a -- h";
+        }
+        String finalHour = hour;
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -161,7 +173,7 @@ public class LoadApiDetail  implements Runnable{
                 bg.setBackgroundColor(colorBg);
                 // Horloge
                 TextView clock = activity.findViewById(R.id.textClock);
-                clock.setText(hour);
+                clock.setText(finalHour);
                 clock.setTextColor(color);
 
             }
@@ -251,7 +263,7 @@ public class LoadApiDetail  implements Runnable{
         // Requête Status Général
         //
         String generalStatus = extractGeneralStatus(json);
-        addGeneralStatus(Service.status(generalStatus,activity),extractHour(json,"page"));
+        addGeneralStatus(Service.status(generalStatus,activity),json);
 
         //
         // Requête Problème en cours

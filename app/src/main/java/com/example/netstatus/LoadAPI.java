@@ -78,7 +78,7 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                         Intent intent = new Intent(activity,DetailsActivity.class);
                         // Envoie le service à la page détail Activity
                         intent.putExtra("service", service);
-
+                        displayAlert("Chargement de la page ...");
                         activity.startActivity(intent); //on affiche l'activity
                     }
                 });
