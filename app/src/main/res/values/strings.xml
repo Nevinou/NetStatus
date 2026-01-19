@@ -22,6 +22,8 @@
     <string name="status_icon">Icon Status</string>
     <string name="last_update">Dernière mise à jour : </string>
     <string name="geneStatus">Statut Générale</string>
+    <string name="description">Description</string>
+    <string name="pasPb">Pas de problème en ce moment</string>
 
 
 </resources>

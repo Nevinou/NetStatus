@@ -7,6 +7,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,6 +15,9 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.cardview.widget.CardView;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,10 +50,67 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    String extractHour (JSONObject json){
+    void addProbleme (JSONArray incidents) throws JSONException{
+        if (incidents.length()==0){
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LinearLayout card = activity.findViewById(R.id.cardPb);
+                    TextView pasPb = new TextView(activity);
+                    pasPb.setText(activity.getString(R.string.pasPb));
+                    pasPb.setTextColor(activity.getColor(R.color.status_operational));
+                    card.addView(pasPb);
+                }
+            });
+        } else {
+            Log.d("text","Trace 1 "+incidents);
+            for (int i = 0; i < incidents.length();i++){
+                ajoutCardProbleme(incidents.getJSONObject(i));
+            }
+        }
+    }
+
+    void ajoutCardProbleme(JSONObject incident)  {
+        // Extraction des données du JSONObject
+        String name;
+        String hour = extractHour(incident);
+        String impact;
+        try {
+            name = incident.getString("name");
+            impact = incident.getString("impact");
+        } catch (JSONException e ){
+            name = activity.getString(R.string.unknown);
+            impact = activity.getString(R.string.unknown);
+        }
+        String finalName = name;
+        String finalImpact = impact;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                LinearLayout cardPb = activity.findViewById(R.id.cardPb);
+                // Récupère le template de Problème
+                LayoutInflater inflater = LayoutInflater.from(activity);
+                CardView templatePb = (CardView) inflater.inflate(R.layout.template_probleme,cardPb,false);
+                // Modifie les éléments du template
+                TextView nameTextView = templatePb.findViewById(R.id.namePb);
+                nameTextView.setText(finalName);
+                // AJout de l'heure de dernière modification
+                TextView clockLastUpdate = templatePb.findViewById(R.id.lastModif);
+                clockLastUpdate.setText(hour);
+                // Ajout de l'impact
+                TextView impactTextView = templatePb.findViewById(R.id.impact);
+                impactTextView.setText(finalImpact);
+
+                // AJout du template à l'activity
+                cardPb.addView(templatePb);
+            }
+        });
+    }
+    String extractHour(JSONObject json){
         String hour;
         try {
-            String input = json.getJSONObject("page").getString("updated_at");
+            String input = json.getString("updated_at");
 
             // Parser la chaîne ISO 8601 en OffsetDateTime
             OffsetDateTime odt = OffsetDateTime.parse(input);
@@ -63,7 +124,23 @@ public class LoadApiDetail  implements Runnable{
 
         return hour;
     }
+    String extractHour (JSONObject json,String name){
+        String hour;
+        try {
+            String input = json.getJSONObject(name).getString("updated_at");
 
+            // Parser la chaîne ISO 8601 en OffsetDateTime
+            OffsetDateTime odt = OffsetDateTime.parse(input);
+
+            // Formatter en hh:mm (12h)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
+            hour = odt.format(formatter);
+        } catch (JSONException e) {
+            hour = "--:--";
+        }
+
+        return hour;
+    }
     void addGeneralStatus (String statusCouleur, String hour) throws NumberFormatException{
         StringTokenizer st = new StringTokenizer(statusCouleur,";");
         String status = st.nextToken();
@@ -132,6 +209,23 @@ public class LoadApiDetail  implements Runnable{
         return generalStatus;
     }
 
+    static JSONArray extractIncidents (JSONObject json){
+        JSONArray incidents;
+        try {
+            incidents = json.getJSONArray("incidents");
+            Log.d("test",incidents.toString());
+        } catch (JSONException e ){
+           incidents = new JSONArray();
+        }
+        return incidents;
+    }
+
+    static void parcourArray (JSONArray array) throws JSONException{
+        for (int i = 0; i < array.length(); i++){
+            Log.d("test",array.getJSONObject(i).toString());
+        }
+    }
+
     @Override
     public void run() {
         //
@@ -152,13 +246,23 @@ public class LoadApiDetail  implements Runnable{
         // Récupération du json de l'api et mise dans les différentes variables
         //
         JSONObject json = loadJson("summary.json");
-        Log.d("test",json.toString());
+
         //
         // Requête Status Général
         //
         String generalStatus = extractGeneralStatus(json);
-        //Log.d("test","trace 1" + generalStatus);
-        addGeneralStatus(Service.status(generalStatus,activity),extractHour(json));
+        addGeneralStatus(Service.status(generalStatus,activity),extractHour(json,"page"));
+
+        //
+        // Requête Problème en cours
+        //
+        JSONArray incidents = extractIncidents(json);
+        try {
+            addProbleme(incidents);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
 
 
 
