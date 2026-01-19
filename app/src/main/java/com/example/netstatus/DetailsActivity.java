@@ -40,7 +40,8 @@ public class DetailsActivity extends AppCompatActivity {
         // Requètes api et affichage des éléments visuel
         // Voir méthode run de la class LoadApiDetail
         //
-        Thread thread = new Thread(new LoadApiDetail(this,service));
+        LoadApiDetail api = new LoadApiDetail(this,service);
+        Thread thread = new Thread(api);
         thread.start();
         try {
             thread.join();
@@ -69,6 +70,8 @@ public class DetailsActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        api.displayAlert("Refresh ...");
+                        recreate();
                         // clear l'activity et rappeler la fonction qui fait les requètes et affiche les templates
                     }
                 }

@@ -76,16 +76,23 @@ public class LoadApiDetail  implements Runnable{
         String name;
         String hour = extractHour(incident);
         String impact;
+        int color,colorBg;
         try {
             name = incident.getString("name");
             StringTokenizer st = new StringTokenizer(Service.status(incident.getString("impact"),activity),";");
             impact = st.nextToken();
+            color = Integer.parseInt(st.nextToken());
+            colorBg = Integer.parseInt(st.nextToken());
+
         } catch (JSONException e ){
             name = activity.getString(R.string.unknown);
             impact = activity.getString(R.string.unknown);
+            color = activity.getColor(R.color.status_inconnu);
+            colorBg = activity.getColor(R.color.status_inconnu_bg);
         }
         String finalName = name;
-
+        int finalColor = color;
+        int finalColorBg = colorBg;
         String finalImpact = impact;
 
         activity.runOnUiThread(new Runnable() {
@@ -96,17 +103,25 @@ public class LoadApiDetail  implements Runnable{
                 // Récupère le template de Problème
                 LayoutInflater inflater = LayoutInflater.from(activity);
                 CardView templatePb = (CardView) inflater.inflate(R.layout.template_probleme,cardPb,false);
+                templatePb.setBackgroundTintList(ColorStateList.valueOf(finalColorBg));
                 // Modifie les éléments du template
                 TextView nameTextView = templatePb.findViewById(R.id.namePb);
                 nameTextView.setText(finalName);
                 // AJout de l'heure de dernière modification
                 TextView clockLastUpdate = templatePb.findViewById(R.id.lastModif);
                 clockLastUpdate.setText(hour);
+                clockLastUpdate.setTextColor(finalColor);
                 // Ajout de l'impact
                 TextView impactTextView = templatePb.findViewById(R.id.impact);
                 impactTextView.setText(finalImpact);
+                impactTextView.setTextColor(finalColor);
                 Log.d("test",finalImpact);
-
+                // Modification couleur rond
+                View impactIndicator = templatePb.findViewById(R.id.impactIndicator);
+                impactIndicator.setBackgroundTintList(ColorStateList.valueOf(finalColor));
+                // Modification couleur du background de l'indicateur
+                LinearLayout indicator = templatePb.findViewById(R.id.indicator);
+                indicator.setBackgroundColor(finalColorBg);
                 // AJout du template à l'activity
                 cardPb.addView(templatePb);
             }
@@ -221,21 +236,30 @@ public class LoadApiDetail  implements Runnable{
         return generalStatus;
     }
 
-    static JSONArray extractIncidents (JSONObject json){
-        JSONArray incidents;
+    static JSONArray extractDataFromJson (JSONObject json, String name){
+        JSONArray data;
         try {
-            incidents = json.getJSONArray("incidents");
-            Log.d("test",incidents.toString());
+            data = json.getJSONArray(name);
+            //Log.d("test",incidents.toString());
         } catch (JSONException e ){
-           incidents = new JSONArray();
+           data = new JSONArray();
         }
-        return incidents;
+        return data;
     }
 
     static void parcourArray (JSONArray array) throws JSONException{
         for (int i = 0; i < array.length(); i++){
             Log.d("test",array.getJSONObject(i).toString());
         }
+    }
+    void displayAlert(String text){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast alert = Toast.makeText(activity,text,Toast.LENGTH_SHORT); //Activity hérite de context
+                alert.show(); //on affiche le Toast
+            }
+        });
     }
 
     @Override
@@ -268,12 +292,17 @@ public class LoadApiDetail  implements Runnable{
         //
         // Requête Problème en cours
         //
-        JSONArray incidents = extractIncidents(json);
+        JSONArray incidents = extractDataFromJson(json,"incidents");
         try {
             addProbleme(incidents);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+
+        //
+        // Affichage des maintenance prévue
+        //
+
 
 
 

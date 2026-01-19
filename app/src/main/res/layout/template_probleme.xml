@@ -6,8 +6,8 @@
     android:layout_marginBottom="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@color/status_critique_bg"
-    app:strokeWidth="0dp">
+    app:cardBackgroundColor="@color/white"
+    app:strokeWidth="0dp"><!--app:cardBackgroundColor="@color/status_critique_bg"-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,44 +21,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/status_critique"
-            android:textStyle="bold"/>
+            android:textColor="@color/black"
+            android:textStyle="bold"/><!--android:textColor="@color/status_critique"-->
 
         <LinearLayout
+            android:id="@+id/indicator"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/lastModif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/status_inconnu_bg"
+            android:padding="12dp"
+            android:layout_marginTop="4dp">
+
+            <View
+                android:id="@+id/impactIndicator"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="@color/status_inconnu" />
+
             <TextView
                 android:id="@+id/impact"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/description"
+                android:text="Statut Inconnue"
                 android:textSize="16sp"
                 android:textColor="@color/status_inconnu"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginStart="12dp" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <TextView
-                android:id="@+id/descriptionPb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:id="@+id/lastModif"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@android:color/black"/>
 
         </LinearLayout>
-
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
