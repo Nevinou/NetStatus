@@ -28,6 +28,7 @@
     <color name="status_critique_bg">#FEE2E2</color>
     <color name="status_maintenance_bg">#DBEAFE</color>
     <color name="status_inconnu_bg">#F3F4F6</color>
+    <color name="maintenance_bg">#FFFFFF</color>
 
     <!---->
     <color name="text_secondary">#525252</color>

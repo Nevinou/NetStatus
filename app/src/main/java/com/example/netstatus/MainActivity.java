@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 //        gestionnaire.addService("Intuit Developer Group","https://status.developer.intuit.com","https://quickbooks.intuit.com/oidam/intuit/sbseg/en_us/Blog/Logos/intuit-logo-image-us-en.png");
 //        gestionnaire.addService("Epic Games","https://status.epicgames.com","https://upload.wikimedia.org/wikipedia/commons/a/a7/Epic_Games_logo.png");
 //        gestionnaire.addService("Scaleway","https://status.scaleway.com","https://images.icon-icons.com/2407/PNG/512/scaleway_icon_146103.png");
-
+// ajouter vercel
         //ajout des urls qui utilisent statuspage.io + image + nom (utile pour la recherche)
 
         services = gestionnaire.getAllServices();

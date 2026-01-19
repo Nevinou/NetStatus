@@ -24,6 +24,9 @@
     <string name="geneStatus">Statut Générale</string>
     <string name="description">Description</string>
     <string name="pasPb">Pas de problème en ce moment</string>
-
+    <string name="maintenances">Maintenances planifiées</string>
+    <string name="pbEnCours">Problèmes en cours</string>
+    <string name="components">Composants du service</string>
+    <string name="pasMaintenance">Pas de Maintenance planifiée</string>
 
 </resources>

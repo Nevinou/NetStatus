@@ -1,7 +1,5 @@
 package com.example.netstatus;
 
-import static android.view.View.VISIBLE;
-
 import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -11,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +61,7 @@ public class LoadApiDetail  implements Runnable{
                 }
             });
         } else {
-            Log.d("text","Trace 1 "+incidents);
+            //Log.d("text","Trace 1 "+incidents);
             for (int i = 0; i < incidents.length();i++){
                 ajoutCardProbleme(incidents.getJSONObject(i));
             }
@@ -115,7 +112,7 @@ public class LoadApiDetail  implements Runnable{
                 TextView impactTextView = templatePb.findViewById(R.id.impact);
                 impactTextView.setText(finalImpact);
                 impactTextView.setTextColor(finalColor);
-                Log.d("test",finalImpact);
+                //Log.d("test",finalImpact);
                 // Modification couleur rond
                 View impactIndicator = templatePb.findViewById(R.id.impactIndicator);
                 impactIndicator.setBackgroundTintList(ColorStateList.valueOf(finalColor));
@@ -126,6 +123,85 @@ public class LoadApiDetail  implements Runnable{
                 cardPb.addView(templatePb);
             }
         });
+    }
+    void addMaintenances (JSONArray maintenances) {
+        if (maintenances.length() ==0){
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LinearLayout card = activity.findViewById(R.id.cardMaintenance);
+                    TextView pasPb = new TextView(activity);
+                    pasPb.setText(activity.getString(R.string.pasMaintenance));
+                    pasPb.setTextColor(activity.getColor(R.color.status_operational));
+                    card.addView(pasPb);
+                }
+            });
+        } else {
+            for (int i = 0; i<maintenances.length();i++){
+                try {
+                    ajoutCardMaintenance(maintenances.getJSONObject(i));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    void ajoutCardMaintenance (JSONObject maintenance){
+        String name;
+        String status;
+        try {
+            name = maintenance.getString("name");
+            status = maintenance.getString("status");
+        } catch (JSONException e) {
+            name = activity.getString(R.string.unknown);
+            status = activity.getString(R.string.unknown);
+
+        }
+        String debutFin = getDateHourMaintenance(maintenance);
+        String finalName = name;
+        String finalStatus = status;
+        Log.d("test","Trace 3");
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout card = activity.findViewById(R.id.cardMaintenance);
+                LayoutInflater inflater = LayoutInflater.from(activity);
+                CardView template = (CardView) inflater.inflate(R.layout.template_maintenance,card,false);
+                // Modification du title
+                TextView title = template.findViewById(R.id.maintenanceTitle);
+                title.setText(finalName);
+                // Modification de la date de début et fin
+                TextView horaire = template.findViewById(R.id.horaireMaintenance);
+                horaire.setText(debutFin);
+                // Modification du status
+                TextView status = template.findViewById(R.id.maintenanceStatus);
+                status.setText(finalStatus);
+
+                card.addView(template);
+            }
+        });
+    }
+    String getDateHourMaintenance (JSONObject maintenance){
+        String delta;
+        try {
+            Log.d("test","maintenance : "+maintenance);
+            String debut = maintenance.getString("scheduled_for");
+            Log.d("test","Trace 1 "+debut);
+            String fin = maintenance.getString("scheduled_until");
+            Log.d("test","Trace 2 "+ fin);
+            OffsetDateTime timeDebut = OffsetDateTime.parse(debut);
+            OffsetDateTime timeFin = OffsetDateTime.parse(fin);
+            Duration duration = Duration.between(timeDebut, timeFin);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            delta = timeDebut.format(formatter)+" --- "+duration.toHours()+" h --- "+timeFin.format(formatter);
+
+        } catch (JSONException e) {
+            delta = "Date/horaire de la maintenance non connue";
+        }
+
+        return delta;
     }
     String extractHour(JSONObject json){
         String delta;
@@ -247,11 +323,6 @@ public class LoadApiDetail  implements Runnable{
         return data;
     }
 
-    static void parcourArray (JSONArray array) throws JSONException{
-        for (int i = 0; i < array.length(); i++){
-            Log.d("test",array.getJSONObject(i).toString());
-        }
-    }
     void displayAlert(String text){
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -302,7 +373,9 @@ public class LoadApiDetail  implements Runnable{
         //
         // Affichage des maintenance prévue
         //
-
+        JSONArray maintenances = extractDataFromJson(json,"scheduled_maintenances");
+        Log.d("test","Maintenances : "+ maintenances);
+        addMaintenances(maintenances);
 
 
 

@@ -123,7 +123,7 @@
                                 android:layout_width="12dp"
                                 android:layout_height="12dp"
                                 android:background="@drawable/circle_shape"
-                                android:backgroundTint="@color/status_inconnu" />
+                                android:backgroundTint="@color/status_inconnu"/>
 
                             <TextView
                                 android:id="@+id/statusText"
@@ -161,6 +161,7 @@
                     app:cardElevation="2dp"
                     app:strokeWidth="2dp"
                     android:padding="5dp">
+
                     <LinearLayout
                         android:id="@+id/cardPb"
                         android:layout_width="match_parent"
@@ -170,7 +171,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Problèmes en cours"
+                            android:text="@string/pbEnCours"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#1F2937"
@@ -180,9 +181,8 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Card Components -->
+                <!-- Maintenances Planifiées -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardComponents"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
@@ -190,6 +190,57 @@
                     app:cardElevation="2dp"
                     app:strokeWidth="2dp"
                     android:padding="5dp">
+
+                    <LinearLayout
+                        android:id="@+id/cardMaintenance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <!-- Titre partie -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/maintenances"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F2937"
+                            android:layout_marginBottom="12dp" />
+
+
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Card Components -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="2dp"
+                    android:padding="5dp">
+                    <LinearLayout
+                        android:id="@+id/cardComponents"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <!-- Titre partie -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/components"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F2937"
+                            android:layout_marginBottom="12dp"/>
+
+
+
+                    </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
