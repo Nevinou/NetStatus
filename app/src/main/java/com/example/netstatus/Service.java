@@ -51,7 +51,9 @@ public class Service implements Serializable {
     public boolean getFavorite(){
         return favorite;
     }
-
+    public void setFavorite(boolean value){
+        favorite = value;
+    }
     static String status(String indicator, Activity activity){
         String status;
         int color,colorBg;

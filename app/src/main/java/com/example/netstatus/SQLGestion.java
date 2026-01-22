@@ -47,4 +47,13 @@ public class SQLGestion {
         db.close();
         return services;
     }
+
+    public void updateService(String serviceName, boolean favorite){
+        SQLiteDatabase db = dbContent.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SQLData.COLUMN_FAVORITE, favorite? 1:0);
+        // SQLite = pas de boolean, donc 1/0
+        db.update(SQLData.TABLE_NAME,values,SQLData.COLUMN_NAME+" = ?",new String[]{serviceName});
+        db.close();
+    }
 }

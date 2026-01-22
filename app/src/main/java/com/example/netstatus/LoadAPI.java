@@ -7,11 +7,14 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import org.json.JSONException;
@@ -33,6 +36,42 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
     LoadAPI(Activity activity, List<Service> services){ //constructeur
         this.activity = activity;
         this.services = services;
+    }
+
+    void loadService(Service service){
+        new Thread(new Runnable() { // on fait dans un nouveau thread les requetes pour aller plus vite
+            @Override
+            public void run() { //l'ordre est cassé car le premier qui a finit de chargé s'affiche...
+                try {
+                    URL url = new URL(service.getApi() + "/api/v2/status.json"); //création url
+                    URLConnection conn = url.openConnection();
+                    //ajouter la permission internet dans le manifest ! Ouverture de la connexion
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); // Flux de lecture
+                    String total = "";
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        total += line; //lecture de toute les lignes
+                    }
+                    reader.close();
+                    //Log.d("JSON",total);
+                    JSONObject json = new JSONObject(total); //création d'un JSONObject
+
+                    InputStream inputImage = new URL(service.getImage()).openStream(); // vu que la méthode setImageURI
+                    // de l'imageView ne prend que des URI locaux, il faut download l'image depuis internet en bitmap
+                    //on transforme l'image en bitmap
+                    Bitmap bitMapImage = BitmapFactory.decodeStream(inputImage);
+
+                    createCard(json,service,bitMapImage); //appel methode
+                } catch (MalformedURLException e) {
+                    displayAlert("Mauvaise URL");
+                } catch (JSONException e) {
+                    displayAlert("Erreur JSON");
+                } catch (IOException e) {
+                    Log.d("Noob",e.toString());
+                    displayAlert("Erreur de donnée pour un service");
+                }
+            }
+        }).start();
     }
 
     void createCard(JSONObject json, Service service, Bitmap bitMapImage){
@@ -82,6 +121,19 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                         activity.startActivity(intent); //on affiche l'activity
                     }
                 });
+
+                CheckBox favoris = card.findViewById(R.id.favorisCheck);
+                if (service.getFavorite()) {
+                    favoris.setChecked(true);
+                }
+                favoris.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                        service.setFavorite(isChecked);
+                        SQLGestion gestionnaire = new SQLGestion(activity);
+                        gestionnaire.updateService(serviceName,isChecked); //maj de la bdd sql
+                    }
+                });
                 parent.addView(card); //parentage pour affichage
             }
         });
@@ -101,38 +153,7 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
     @Override
     public void run() {
         for (Service service : services) {
-            new Thread(new Runnable() { // on fait dans un nouveau thread les requetes pour aller plus vite
-                @Override
-                public void run() { //l'ordre est cassé car le premier qui a finit de chargé s'affiche...
-                    try {
-                        URL url = new URL(service.getApi() + "/api/v2/status.json"); //création url
-                        URLConnection conn = url.openConnection(); //ajouter la permission internet dans le manifest ! Ouverture de la connexion
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); // Flux de lecture
-                        String total = "";
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            total += line; //lecture de toute les lignes
-                        }
-                        reader.close();
-                        //Log.d("JSON",total);
-                        JSONObject json = new JSONObject(total); //création d'un JSONObject
-
-                        InputStream inputImage = new URL(service.getImage()).openStream(); // vu que la méthode setImageURI
-                        // de l'imageView ne prend que des URI locaux, il faut download l'image depuis internet en bitmap
-                        //on transforme l'image en bitmap
-                        Bitmap bitMapImage = BitmapFactory.decodeStream(inputImage);
-
-                        createCard(json,service,bitMapImage); //appel methode
-                    } catch (MalformedURLException e) {
-                        displayAlert("Mauvaise URL");
-                    } catch (JSONException e) {
-                        displayAlert("Erreur JSON");
-                    } catch (IOException e) {
-                        Log.d("Noob",e.toString());
-                        displayAlert("Erreur de donnée pour un service");
-                    }
-                }
-            }).start();
+            loadService(service);
         }
     }
 }

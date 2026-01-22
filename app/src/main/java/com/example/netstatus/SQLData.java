@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class SQLData extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 7; //incrémenté = delete tout, refaire les appels d'ajout
+    public static final int DATABASE_VERSION = 8; //incrémenté = delete tout, refaire les appels d'ajout
     public static final String DATABASE_NAME = "services.db";
 
     public static final String TABLE_NAME = "services";
