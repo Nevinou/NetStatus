@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -150,18 +151,22 @@ public class LoadApiDetail  implements Runnable{
     void ajoutCardMaintenance (JSONObject maintenance){
         String name;
         String status;
+        String impact;
         try {
             name = maintenance.getString("name");
             status = maintenance.getString("status");
+            impact = maintenance.getString("impact");
         } catch (JSONException e) {
             name = activity.getString(R.string.unknown);
             status = activity.getString(R.string.unknown);
-
+            impact = activity.getString(R.string.unknown);
         }
         String debutFin = getDateHourMaintenance(maintenance);
         String finalName = name;
-        String finalStatus = status;
-        Log.d("test","Trace 3");
+        StringTokenizer st = new StringTokenizer(Service.status(impact,activity),";");
+        String finalImpact = st.nextToken();
+        int color = Integer.parseInt(st.nextToken());
+        String finalStatus = Service.statusMaintenance(status,activity);
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -177,6 +182,104 @@ public class LoadApiDetail  implements Runnable{
                 // Modification du status
                 TextView status = template.findViewById(R.id.maintenanceStatus);
                 status.setText(finalStatus);
+                // Impacte de la maintenance
+                TextView impact = template.findViewById(R.id.impact);
+                impact.setText(finalImpact);
+                impact.setTextColor(color);
+
+                // Impacte indicator changement de couleur
+                View impactIndicator = template.findViewById(R.id.impactIndicator);
+                impactIndicator.setBackgroundTintList(ColorStateList.valueOf(color));
+                card.addView(template);
+            }
+        });
+    }
+
+    void addComponents (JSONArray components){
+        if (components.length() == 0){
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LinearLayout card = activity.findViewById(R.id.cardComponents);
+                    TextView pasPb = new TextView(activity);
+                    pasPb.setText(activity.getString(R.string.pasComponents));
+                    pasPb.setTextColor(activity.getColor(R.color.hard_broken));
+                    card.addView(pasPb);
+                }
+            });
+        } else {
+            Boolean isList;
+            try {
+                components.getJSONArray(0);
+                isList = false;
+            } catch (Exception e) {
+                isList = true;
+            }
+            if (isList){
+                for (int i = 0; i<components.length();i ++){
+                    try {
+                        JSONObject component = components.getJSONObject(i);
+                        // Filtre les components
+                        // TODO a voir pour faire un filtre
+                        //if (component.getString("group_id") == "null") {
+                            addComponent(component);
+                        //}
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                        // TODO ajouté un vrai truc
+                    }
+                }
+            } else {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LinearLayout card = activity.findViewById(R.id.cardComponents);
+                        TextView pasPb = new TextView(activity);
+                        pasPb.setText(activity.getString(R.string.pasComponents));
+                        pasPb.setTextColor(activity.getColor(R.color.hard_broken));
+                        card.addView(pasPb);
+                    }
+                });
+            }
+
+        }
+
+    }
+
+    void addComponent (JSONObject component) {
+        String name;
+        String status;
+        try {
+            name = component.getString("name");
+            status = component.getString("status");
+        } catch (Exception e) {
+            name = activity.getString(R.string.unknown); // TODO refaire une nouvelle entrée dans STRING
+            status = activity.getString(R.string.unknown);
+            // TODO Faire un truc bien
+        }
+        String finalName = name;
+        StringTokenizer st = new StringTokenizer(Service.statusComponent(status,activity),";");
+        String finalStatus = st.nextToken();
+        int color = Integer.parseInt(st.nextToken());
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Récupération card component
+                LinearLayout card = activity.findViewById(R.id.cardComponents);
+                // Création d'une nouvelle template
+                LayoutInflater inflater = LayoutInflater.from(activity);
+                LinearLayout template = (LinearLayout) inflater.inflate(R.layout.template_component,card,false);
+                // textView Name component
+                TextView title = template.findViewById(R.id.nameComponent);
+                title.setText(finalName);
+                // TextView status
+                TextView textStatus = template.findViewById(R.id.statusComponent);
+                textStatus.setText(finalStatus);
+                textStatus.setTextColor(color);
+                // Indicator
+                View indicator = template.findViewById(R.id.componentIndicator);
+                indicator.setBackgroundTintList(ColorStateList.valueOf(color));
 
                 card.addView(template);
             }
@@ -376,6 +479,13 @@ public class LoadApiDetail  implements Runnable{
         JSONArray maintenances = extractDataFromJson(json,"scheduled_maintenances");
         Log.d("test","Maintenances : "+ maintenances);
         addMaintenances(maintenances);
+
+        //
+        // Affichage des component et de leur état
+        //
+        JSONArray components = extractDataFromJson(json,"components");
+        addComponents(components);
+
 
 
 

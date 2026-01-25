@@ -65,21 +65,21 @@
             android:padding="12dp"
             android:layout_marginTop="4dp">
             <View
-                android:id="@+id/statusIndicator"
+                android:id="@+id/impactIndicator"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:background="@drawable/circle_shape"
                 android:backgroundTint="@color/status_inconnu"/>
 
             <TextView
-                android:id="@+id/statusMaintenance"
+                android:id="@+id/impact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Statut Inconnue"
                 android:textSize="16sp"
                 android:textColor="@color/status_inconnu"
                 android:textStyle="bold"
-                android:layout_marginStart="12dp" />
+                android:layout_marginStart="12dp"/>
 
         </LinearLayout>
     </LinearLayout>

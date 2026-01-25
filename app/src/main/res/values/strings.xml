@@ -28,5 +28,15 @@
     <string name="pbEnCours">Problèmes en cours</string>
     <string name="components">Composants du service</string>
     <string name="pasMaintenance">Pas de Maintenance planifiée</string>
+    <string name="pasComponents">Pas de components trouvés</string>
+    <string name="degraded_performance">Performance dégradée</string>
+    <string name="partial_outage">Panne partielle</string>
+    <string name="major_outage">Panne majeure</string>
 
+    <!-- Status Maintenance -->
+    <string name="scheduled">A venir</string>
+    <string name="in_progress">En progression</string>
+    <string name="verifying">En vérification</string>
+    <string name="completed">Finis</string>
+    <string name="resolved">Résolut</string>
 </resources>
