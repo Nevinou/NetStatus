@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,19 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     void init(){
 
-        loadAll();
-
-        List<Service> favories = new ArrayList<Service>();
-        for(Service serv:services) {
-            //Log.d("Resultat",serv.toString());
-            if (serv.getFavorite()){
-                favories.add(serv);
-            }
-        }
-        //le réseau doit être fait dans un thread externe
-        Thread thread = new Thread(new LoadAPI(this,favories));
-        thread.start();
-
         //on prend le boutton de l'activity qui a l'id "more"
         Button more = findViewById(R.id.more);
         more.setOnClickListener(new View.OnClickListener() {
@@ -98,5 +86,42 @@ public class MainActivity extends AppCompatActivity {
         });
 
         init(); //appel de la méthode init
+    }
+
+    @Override
+    protected void onResume() { //run a chaque affichage
+        //run au démarrage et a chaque reprise due au finish()
+        super.onResume();
+
+        LinearLayout layout = findViewById(R.id.main);
+        layout.removeAllViews(); //clear
+
+        loadAll();
+
+        List<String> bestNames = new ArrayList<String>();
+        bestNames.add("Discord");
+        bestNames.add("Epic Games");
+        bestNames.add("Cloudflare");
+        //nom des services en cas de non favoris
+
+        List<Service> bestServices = new ArrayList<Service>();
+        //liste a afficher en cas de non favoris
+        List<Service> favories = new ArrayList<Service>();
+        for(Service serv:services) {
+            //Log.d("Resultat",serv.toString());
+            if (serv.getFavorite()){
+                favories.add(serv);
+            }
+            if (bestNames.contains(serv.getName())){
+                bestServices.add(serv);
+            }
+        }
+        if (favories.isEmpty()){
+            favories = bestServices;
+        }
+
+        //le réseau doit être fait dans un thread externe
+        Thread thread = new Thread(new LoadAPI(this,favories));
+        thread.start();
     }
 }

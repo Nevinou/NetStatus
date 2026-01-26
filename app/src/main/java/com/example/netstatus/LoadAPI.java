@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +28,16 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de run
     Activity activity;
@@ -81,11 +90,16 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                 String serviceName;
                 String status;
                 int color;
+                String date;
                 try {
                     JSONObject data = json.getJSONObject("page"); //récupération json page, dans le futur, utilisé pour afficher l'heure d'update
                     JSONObject stat = json.getJSONObject("status"); //récupération du status json
                     serviceName = service.getName();
+
+                    date = data.getString("updated_at");
+
                     String result = Service.status(stat.getString("indicator"),activity);
+
                     StringTokenizer tokenizer = new StringTokenizer(result,";");
                     status = tokenizer.nextToken();
                     color = Integer.parseInt(tokenizer.nextToken());
@@ -109,6 +123,19 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
 
                 ImageView image = card.findViewById(R.id.logo);
                 image.setImageBitmap(bitMapImage);
+
+                TextView clock = card.findViewById(R.id.lastUpdate);
+
+
+                OffsetDateTime isoDate = OffsetDateTime.parse(date);
+                //notre date est ISO 8601, on instancie un objet date ISO 8601
+                DateTimeFormatter newDate = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+                //on formate cela en format jour/mois/année heure:min:sec avec la timezone du téléphone
+                //la timeZone téléphone dépend de l'utilisateur et la date ISO a un offset
+                //la méthode format va convertir la date ISO en format voulu avec la timezone du tel
+                String localTime = newDate.format(isoDate);
+
+                clock.setText(localTime);
 
                 card.setOnClickListener(new View.OnClickListener() {
                     @Override
