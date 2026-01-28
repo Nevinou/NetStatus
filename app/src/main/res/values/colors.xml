@@ -18,7 +18,7 @@
     <color name="status_mineur">#FFC107</color>
     <color name="status_majeur">#FF6B00</color>
     <color name="status_critique">#DC2626</color>
-    <color name="status_maintenance">#3B82F6</color>
+    <color name="status_maintenance">#1E40AF</color>
     <color name="status_inconnu">#6B7280</color>
 
     <!-- Couleurs de fond (bg) -->

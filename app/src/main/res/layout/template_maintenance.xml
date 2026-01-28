@@ -15,6 +15,7 @@
         android:padding="12dp"
         android:layout_marginTop="4dp">
 
+        <!-- En-tête : Titre + Badge Status -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +30,7 @@
                 android:text="Mise à jour infrastructure"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#1E40AF"/>
+                android:textColor="@color/status_maintenance"/>
 
             <TextView
                 android:id="@+id/maintenanceStatus"
@@ -42,21 +43,96 @@
                 android:background="@drawable/badge_background"
                 android:padding="4dp" />
         </LinearLayout>
+
+        <!-- Section Horaires : Début et Fin côte à côte -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:padding="16dp"
-            android:gravity="center">
-            <TextView
-                android:id="@+id/horaireMaintenance"
-                android:layout_width="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp">
+
+            <!-- Bloc Début -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="12/12/12 16:15 --- durée --- 12/12/12 12:13"/>
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/time_item_background"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DÉBUT"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/heure_debut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="02:00"
+                    android:textSize="16sp"
+                    android:textColor="@color/status_maintenance"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+
+                <TextView
+                    android:id="@+id/date_debut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="29 Jan 2026"
+                    android:textSize="14sp"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Bloc Fin -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/time_item_background"
+                android:padding="12dp"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FIN PRÉVUE"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/heure_fin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="06:00"
+                    android:textColor="@color/status_maintenance"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/date_fin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="29 Jan 2026"
+                    android:textSize="14sp"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Section Impact -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,6 +140,7 @@
             android:gravity="center_vertical"
             android:padding="12dp"
             android:layout_marginTop="4dp">
+
             <View
                 android:id="@+id/impactIndicator"
                 android:layout_width="12dp"
@@ -75,7 +152,7 @@
                 android:id="@+id/impact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Statut Inconnue"
+                android:text="Statut Inconnu"
                 android:textSize="16sp"
                 android:textColor="@color/status_inconnu"
                 android:textStyle="bold"

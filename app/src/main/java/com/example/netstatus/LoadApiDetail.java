@@ -4,16 +4,15 @@ import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,10 +25,12 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 public class LoadApiDetail  implements Runnable{
     Activity activity;
@@ -49,7 +50,7 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    void addProbleme (JSONArray incidents) throws JSONException{
+    void addProbleme (JSONArray incidents, String fuseauHoraire) throws JSONException{
         if (incidents.length()==0){
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -64,29 +65,28 @@ public class LoadApiDetail  implements Runnable{
         } else {
             //Log.d("text","Trace 1 "+incidents);
             for (int i = 0; i < incidents.length();i++){
-                ajoutCardProbleme(incidents.getJSONObject(i));
+                ajoutCardProbleme(incidents.getJSONObject(i),fuseauHoraire);
             }
         }
     }
 
-    void ajoutCardProbleme(JSONObject incident)  {
+    void ajoutCardProbleme(JSONObject incident, String fuseauHoraire)  {
         // Extraction des données du JSONObject
-        String name;
-        String hour = extractHour(incident);
-        String impact;
-        int color,colorBg;
+        String name = activity.getString(R.string.unknown);
+        String hour = extractHour(incident,fuseauHoraire);
+        String impact = activity.getString(R.string.unknown);
+        int color = activity.getColor(R.color.status_inconnu);
+        int colorBg = activity.getColor(R.color.status_inconnu_bg);
         try {
             name = incident.getString("name");
             StringTokenizer st = new StringTokenizer(Service.status(incident.getString("impact"),activity),";");
             impact = st.nextToken();
             color = Integer.parseInt(st.nextToken());
             colorBg = Integer.parseInt(st.nextToken());
-
         } catch (JSONException e ){
-            name = activity.getString(R.string.unknown);
-            impact = activity.getString(R.string.unknown);
-            color = activity.getColor(R.color.status_inconnu);
-            colorBg = activity.getColor(R.color.status_inconnu_bg);
+            System.err.println("Erreur lors de la lecture des données de l'incident : " + e.getMessage());
+        } catch (NoSuchElementException e){
+            System.err.println("Format de statut invalide : " + e.getMessage());
         }
         String finalName = name;
         int finalColor = color;
@@ -125,7 +125,7 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    void addMaintenances (JSONArray maintenances) {
+    void addMaintenances (JSONArray maintenances, String fuseauHoraire) {
         if (maintenances.length() ==0){
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -140,7 +140,7 @@ public class LoadApiDetail  implements Runnable{
         } else {
             for (int i = 0; i<maintenances.length();i++){
                 try {
-                    ajoutCardMaintenance(maintenances.getJSONObject(i));
+                    ajoutCardMaintenance(maintenances.getJSONObject(i),fuseauHoraire);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -148,20 +148,21 @@ public class LoadApiDetail  implements Runnable{
         }
     }
 
-    void ajoutCardMaintenance (JSONObject maintenance){
-        String name;
-        String status;
-        String impact;
+    void ajoutCardMaintenance (JSONObject maintenance, String fuseauHoraire){
+        // Valeur par défaut
+        String name = activity.getString(R.string.unknown);
+        String status = activity.getString(R.string.unknown);
+        String impact = activity.getString(R.string.unknown);
+        ArrayList<String> dateHour = dateHourMaintenance(maintenance,fuseauHoraire);
         try {
             name = maintenance.getString("name");
             status = maintenance.getString("status");
             impact = maintenance.getString("impact");
-        } catch (JSONException e) {
-            name = activity.getString(R.string.unknown);
-            status = activity.getString(R.string.unknown);
-            impact = activity.getString(R.string.unknown);
+        } catch (JSONException e ){
+            System.err.println("Erreur lors de la lecture des données de l'incident : " + e.getMessage());
+        } catch (NoSuchElementException e){
+            System.err.println("Format de statut invalide : " + e.getMessage());
         }
-        String debutFin = getDateHourMaintenance(maintenance);
         String finalName = name;
         StringTokenizer st = new StringTokenizer(Service.status(impact,activity),";");
         String finalImpact = st.nextToken();
@@ -177,8 +178,14 @@ public class LoadApiDetail  implements Runnable{
                 TextView title = template.findViewById(R.id.maintenanceTitle);
                 title.setText(finalName);
                 // Modification de la date de début et fin
-                TextView horaire = template.findViewById(R.id.horaireMaintenance);
-                horaire.setText(debutFin);
+                TextView hourDebut = template.findViewById(R.id.heure_debut);
+                hourDebut.setText(dateHour.get(0));
+                TextView dateDebut = template.findViewById(R.id.date_debut);
+                dateDebut.setText(dateHour.get(1));
+                TextView hourFin = template.findViewById(R.id.heure_fin);
+                hourFin.setText(dateHour.get(2));
+                TextView dateFin = template.findViewById(R.id.date_fin);
+                dateFin.setText(dateHour.get(3));
                 // Modification du status
                 TextView status = template.findViewById(R.id.maintenanceStatus);
                 status.setText(finalStatus);
@@ -194,7 +201,40 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
+    ArrayList<String> dateHourMaintenance (JSONObject maintenance, String fuseauHoraire){
+        ArrayList<String> dateHour = new ArrayList<String>();
+        try {
+            // Extraire les Date/heure du json
+            String scheduledFor = maintenance.getString("scheduled_for");
+            String scheduledUntil = maintenance.getString("scheduled_until");
 
+
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Ajuster si nécessaire
+
+            // Format de sortie
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm");
+            dateFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
+            hourFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
+
+
+            Date dateDebut = inputFormat.parse(scheduledFor);
+            dateHour.add(hourFormat.format(dateDebut));  // [0] Heure de début
+            dateHour.add(dateFormat.format(dateDebut));  // [1] Date de début
+
+            Date dateFin = inputFormat.parse(scheduledUntil);
+            dateHour.add(hourFormat.format(dateFin));    // [2] Heure de fin
+            dateHour.add(dateFormat.format(dateFin));    // [3] Date de fin
+
+        } catch (Exception e) {
+            dateHour.add("--:--");
+            dateHour.add("--/--/----");
+            dateHour.add("--:--");
+            dateHour.add("--/--/----");
+        }
+        return dateHour;
+    }
     void addComponents (JSONArray components){
         if (components.length() == 0){
             activity.runOnUiThread(new Runnable() {
@@ -208,7 +248,7 @@ public class LoadApiDetail  implements Runnable{
                 }
             });
         } else {
-            Boolean isList;
+            boolean isList;
             try {
                 components.getJSONArray(0);
                 isList = false;
@@ -219,14 +259,11 @@ public class LoadApiDetail  implements Runnable{
                 for (int i = 0; i<components.length();i ++){
                     try {
                         JSONObject component = components.getJSONObject(i);
-                        // Filtre les components
-                        // TODO a voir pour faire un filtre
-                        //if (component.getString("group_id") == "null") {
-                            addComponent(component);
-                        //}
+                        addComponent(component);
+                    } catch (JSONException e) {
+                        System.err.println("Composant invalide à l'index " + i + " : " + e.getMessage());
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
-                        // TODO ajouté un vrai truc
+                        System.err.println("Erreur lors de l'ajout du composant " + i + " : " + e.getMessage());
                     }
                 }
             } else {
@@ -285,69 +322,53 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    String getDateHourMaintenance (JSONObject maintenance){
-        String delta;
-        try {
-            Log.d("test","maintenance : "+maintenance);
-            String debut = maintenance.getString("scheduled_for");
-            Log.d("test","Trace 1 "+debut);
-            String fin = maintenance.getString("scheduled_until");
-            Log.d("test","Trace 2 "+ fin);
-            OffsetDateTime timeDebut = OffsetDateTime.parse(debut);
-            OffsetDateTime timeFin = OffsetDateTime.parse(fin);
-            Duration duration = Duration.between(timeDebut, timeFin);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-            delta = timeDebut.format(formatter)+" --- "+duration.toHours()+" h --- "+timeFin.format(formatter);
-
-        } catch (JSONException e) {
-            delta = "Date/horaire de la maintenance non connue";
-        }
-
-        return delta;
-    }
-    String extractHour(JSONObject json){
+    String extractHour(JSONObject json, String fuseauHoraire){
         String delta;
         try {
             String input = json.getString("updated_at");
-            OffsetDateTime odt = OffsetDateTime.parse(input);
-            OffsetDateTime now = OffsetDateTime.now();
-            Duration duration = Duration.between(odt,now);
 
-            delta = "Il y a "+duration.toHours()+" h";
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
-            //hour = odt.format(formatter);
-        } catch (JSONException e) {
+            // Parser la date qui est dans le fuseau horaire spécifié
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            inputFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
+            Date dateUpdate = inputFormat.parse(input);
+
+            // Date actuelle dans le fuseau horaire du téléphone (par défaut)
+            Date now = new Date();
+
+            // Calculer la différence en millisecondes
+            long diffMillis = now.getTime() - dateUpdate.getTime();
+            long diffMinutes = diffMillis / (60 * 1000);
+            long diffHours = diffMinutes / 60;
+            long remainingMinutes = diffMinutes % 60;
+            long diffDays = diffHours / 24;
+
+            // Formater selon la durée
+            if (diffDays > 0) {
+                delta = "Il y a " + diffDays + " j";
+            } else if (diffHours > 0) {
+                delta = "Il y a " + diffHours + " h " + remainingMinutes + " min";
+            } else if (diffMinutes > 0) {
+                delta = "Il y a " + diffMinutes + " min";
+            } else {
+                delta = "À l'instant";
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'extraction de l'heure : " + e.getMessage());
             delta = "Il y a -- h";
         }
-
         return delta;
     }
-    long extractHour (JSONObject json,String name){
-        long delta;
-        try {
-            String input = json.getJSONObject(name).getString("updated_at");
-            OffsetDateTime odt = OffsetDateTime.parse(input);
-            OffsetDateTime now = OffsetDateTime.now();
-            Duration duration = Duration.between(odt,now);
 
-            delta = duration.toHours();
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
-            //hour = odt.format(formatter);
-        } catch (JSONException e) {
-            delta = -1;
-        }
-
-        return delta;
-    }
-    void addGeneralStatus (String statusCouleur, JSONObject json) throws NumberFormatException{
+    void addGeneralStatus (String statusCouleur, JSONObject json,String fuseauHoraire) throws NumberFormatException{
         StringTokenizer st = new StringTokenizer(statusCouleur,";");
         String status = st.nextToken();
         int color = Integer.parseInt(st.nextToken());
         int colorBg = Integer.parseInt(st.nextToken());
         String hour;
         try {
-            hour = extractHour(json.getJSONObject("page"));
+            hour = extractHour(json.getJSONObject("page"),fuseauHoraire);
         } catch (JSONException e) {
             hour = "Il y a -- h";
         }
@@ -363,8 +384,10 @@ public class LoadApiDetail  implements Runnable{
                 View indicator = activity.findViewById(R.id.statusIndicator);
                 indicator.setBackgroundTintList(ColorStateList.valueOf(color));
                 // Couleur background
-                LinearLayout bg = activity.findViewById(R.id.statusGeneralBG);
-                bg.setBackgroundColor(colorBg);
+                CardView bg = activity.findViewById(R.id.statusGeneralBG);
+                bg.setBackgroundTintList(ColorStateList.valueOf(colorBg));
+                //CardView bg = activity.findViewById(R.id.statusGeneralBG);
+                //bg.setBackgroundColor(colorBg);
                 // Horloge
                 TextView clock = activity.findViewById(R.id.textClock);
                 clock.setText(finalHour);
@@ -414,6 +437,15 @@ public class LoadApiDetail  implements Runnable{
         }
         return generalStatus;
     }
+    String extractFuseauHoraire (JSONObject json){
+        String fuseauHoraire = "";
+        try {
+            fuseauHoraire = json.getJSONObject("page").getString("time_zone");
+        } catch (JSONException e) {
+            fuseauHoraire = "UTC";
+        }
+        return fuseauHoraire;
+    }
 
     static JSONArray extractDataFromJson (JSONObject json, String name){
         JSONArray data;
@@ -447,9 +479,9 @@ public class LoadApiDetail  implements Runnable{
             // Ajout du log sur l'interface graphique
             addLogo(logo);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur : URL du logo invalide - " + e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Erreur : Impossible de charger le logo - " + e.getMessage());
         }
 
         //
@@ -460,15 +492,18 @@ public class LoadApiDetail  implements Runnable{
         //
         // Requête Status Général
         //
+        String fuseauHoraire = extractFuseauHoraire(json);
         String generalStatus = extractGeneralStatus(json);
-        addGeneralStatus(Service.status(generalStatus,activity),json);
+        addGeneralStatus(Service.status(generalStatus,activity),json, fuseauHoraire);
+        // Récupération du fuseau orraire
+
 
         //
         // Requête Problème en cours
         //
         JSONArray incidents = extractDataFromJson(json,"incidents");
         try {
-            addProbleme(incidents);
+            addProbleme(incidents,fuseauHoraire);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -477,14 +512,91 @@ public class LoadApiDetail  implements Runnable{
         // Affichage des maintenance prévue
         //
         JSONArray maintenances = extractDataFromJson(json,"scheduled_maintenances");
-        Log.d("test","Maintenances : "+ maintenances);
-        addMaintenances(maintenances);
+        // Log.d("test","Maintenances : "+ maintenances);
+        addMaintenances(maintenances,fuseauHoraire);
 
         //
         // Affichage des component et de leur état
         //
         JSONArray components = extractDataFromJson(json,"components");
         addComponents(components);
+
+        //
+        // Boutton dropdown pour les différents champ (Maintenance, composant, probleme)
+        //
+        // Bouton Maintenance
+        ImageButton buttonMaintenance = activity.findViewById(R.id.dropdown_maintenance);
+        buttonMaintenance.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LinearLayout maintenance = activity.findViewById(R.id.cardMaintenance);
+                                ImageButton buttonMaintenance = activity.findViewById(R.id.dropdown_maintenance);
+
+                                if (maintenance.getVisibility() == View.VISIBLE){
+                                    maintenance.setVisibility(View.GONE);
+                                    buttonMaintenance.setSelected(true);
+                                } else {
+                                    maintenance.setVisibility(View.VISIBLE);
+                                    buttonMaintenance.setSelected(false);
+                                }
+
+                            }
+                        });
+                    }
+                }
+        );
+        ImageButton buttonProbleme = activity.findViewById(R.id.dropdown_probleme);
+        buttonProbleme.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LinearLayout maintenance = activity.findViewById(R.id.cardPb);
+                                ImageButton buttonMaintenance = activity.findViewById(R.id.dropdown_probleme);
+
+                                if (maintenance.getVisibility() == View.VISIBLE){
+                                    maintenance.setVisibility(View.GONE);
+                                    buttonMaintenance.setSelected(true);
+                                } else {
+                                    maintenance.setVisibility(View.VISIBLE);
+                                    buttonMaintenance.setSelected(false);
+                                }
+
+                            }
+                        });
+                    }
+                }
+        );
+        ImageButton buttonComponents = activity.findViewById(R.id.dropdown_components);
+        buttonComponents.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LinearLayout maintenance = activity.findViewById(R.id.cardComponents);
+                                ImageButton buttonMaintenance = activity.findViewById(R.id.dropdown_components);
+
+                                if (maintenance.getVisibility() == View.VISIBLE){
+                                    maintenance.setVisibility(View.GONE);
+                                    buttonMaintenance.setSelected(true);
+                                } else {
+                                    maintenance.setVisibility(View.VISIBLE);
+                                    buttonMaintenance.setSelected(false);
+                                }
+
+                            }
+                        });
+                    }
+                }
+        );
 
 
 
