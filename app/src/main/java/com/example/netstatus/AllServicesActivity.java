@@ -25,6 +25,7 @@ public class AllServicesActivity extends AppCompatActivity {
     List<Service> services;
     int count;
     final int increment = 10;
+    LinearLayout layout;
 
     List<Service> loadMore(){
         List<Service> next = new ArrayList<Service>();
@@ -37,7 +38,6 @@ public class AllServicesActivity extends AppCompatActivity {
     }
 
     void filterServices(String text) {
-        LinearLayout layout = findViewById(R.id.main);
         List<Service> toLoad = new ArrayList<Service>();
 
         layout.removeAllViews();
@@ -73,8 +73,6 @@ public class AllServicesActivity extends AppCompatActivity {
             long last = 0; // doit être ici, Java n’autorise pas la modification d’une variable locale de la méthode à l’intérieur d’une classe interne anonyme
             @Override
             public void onScrollChanged() {
-                LinearLayout layout = findViewById(R.id.main);
-
                 int diff = layout.getBottom() - (scroll.getHeight() + scroll.getScrollY());
                 //diff = distance entre le bas de la frame et le bas visible
                 //getHeight : Retourne la hauteur visible du ScrollView, en pixels
@@ -98,6 +96,7 @@ public class AllServicesActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) { //appuit sur une touche
                 if (newText.equals("")){
+                    layout.removeAllViews();
                     count = 10;
                     List<Service> mustLoad = loadMore();
                     Thread thread = new Thread(new LoadAPI(current,mustLoad));
@@ -124,7 +123,11 @@ public class AllServicesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_all_services);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+
+        layout = findViewById(R.id.main);
+        //doit etre fait apres le setContentView
+
+        ViewCompat.setOnApplyWindowInsetsListener(layout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left+20, systemBars.top, systemBars.right+20, systemBars.bottom);
             return insets;

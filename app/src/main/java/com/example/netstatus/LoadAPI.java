@@ -76,7 +76,6 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
                 } catch (JSONException e) {
                     displayAlert("Erreur JSON");
                 } catch (IOException e) {
-                    Log.d("Noob",e.toString());
                     displayAlert("Erreur de donnée pour un service");
                 }
             }

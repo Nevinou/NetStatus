@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -25,12 +26,13 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 public class LoadApiDetail  implements Runnable{
     Activity activity;
@@ -50,7 +52,7 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    void addProbleme (JSONArray incidents, String fuseauHoraire) throws JSONException{
+    void addProbleme (JSONArray incidents) throws JSONException{
         if (incidents.length()==0){
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -65,15 +67,15 @@ public class LoadApiDetail  implements Runnable{
         } else {
             //Log.d("text","Trace 1 "+incidents);
             for (int i = 0; i < incidents.length();i++){
-                ajoutCardProbleme(incidents.getJSONObject(i),fuseauHoraire);
+                ajoutCardProbleme(incidents.getJSONObject(i));
             }
         }
     }
 
-    void ajoutCardProbleme(JSONObject incident, String fuseauHoraire)  {
+    void ajoutCardProbleme(JSONObject incident)  {
         // Extraction des données du JSONObject
         String name = activity.getString(R.string.unknown);
-        String hour = extractHour(incident,fuseauHoraire);
+        String hour = extractHour(incident);
         String impact = activity.getString(R.string.unknown);
         int color = activity.getColor(R.color.status_inconnu);
         int colorBg = activity.getColor(R.color.status_inconnu_bg);
@@ -125,7 +127,7 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    void addMaintenances (JSONArray maintenances, String fuseauHoraire) {
+    void addMaintenances (JSONArray maintenances) {
         if (maintenances.length() ==0){
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -140,7 +142,7 @@ public class LoadApiDetail  implements Runnable{
         } else {
             for (int i = 0; i<maintenances.length();i++){
                 try {
-                    ajoutCardMaintenance(maintenances.getJSONObject(i),fuseauHoraire);
+                    ajoutCardMaintenance(maintenances.getJSONObject(i));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -148,12 +150,12 @@ public class LoadApiDetail  implements Runnable{
         }
     }
 
-    void ajoutCardMaintenance (JSONObject maintenance, String fuseauHoraire){
+    void ajoutCardMaintenance (JSONObject maintenance){
         // Valeur par défaut
         String name = activity.getString(R.string.unknown);
         String status = activity.getString(R.string.unknown);
         String impact = activity.getString(R.string.unknown);
-        ArrayList<String> dateHour = dateHourMaintenance(maintenance,fuseauHoraire);
+        ArrayList<String> dateHour = dateHourMaintenance(maintenance);
         try {
             name = maintenance.getString("name");
             status = maintenance.getString("status");
@@ -201,29 +203,23 @@ public class LoadApiDetail  implements Runnable{
             }
         });
     }
-    ArrayList<String> dateHourMaintenance (JSONObject maintenance, String fuseauHoraire){
+    ArrayList<String> dateHourMaintenance (JSONObject maintenance){
         ArrayList<String> dateHour = new ArrayList<String>();
         try {
             // Extraire les Date/heure du json
             String scheduledFor = maintenance.getString("scheduled_for");
             String scheduledUntil = maintenance.getString("scheduled_until");
-
-
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Ajuster si nécessaire
-
             // Format de sortie
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
-            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm");
-            dateFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
-            hourFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
+            DateTimeFormatter hourFormat = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault());
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault());
 
-
-            Date dateDebut = inputFormat.parse(scheduledFor);
+            OffsetDateTime dateDebut = OffsetDateTime.parse(scheduledFor);
+            //notre date est ISO 8601, on instancie un objet date ISO 8601
             dateHour.add(hourFormat.format(dateDebut));  // [0] Heure de début
             dateHour.add(dateFormat.format(dateDebut));  // [1] Date de début
 
-            Date dateFin = inputFormat.parse(scheduledUntil);
+            OffsetDateTime dateFin = OffsetDateTime.parse(scheduledUntil);
+            //notre date est ISO 8601, on instancie un objet date ISO 8601
             dateHour.add(hourFormat.format(dateFin));    // [2] Heure de fin
             dateHour.add(dateFormat.format(dateFin));    // [3] Date de fin
 
@@ -323,21 +319,20 @@ public class LoadApiDetail  implements Runnable{
         });
     }
 
-    String extractHour(JSONObject json, String fuseauHoraire){
+    String extractHour(JSONObject json){
         String delta;
         try {
             String input = json.getString("updated_at");
 
-            // Parser la date qui est dans le fuseau horaire spécifié
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone(fuseauHoraire));
-            Date dateUpdate = inputFormat.parse(input);
+            OffsetDateTime isoDate = OffsetDateTime.parse(input);
 
-            // Date actuelle dans le fuseau horaire du téléphone (par défaut)
-            Date now = new Date();
+            //Date actuelle en UTC+0, plus moderne que Date
+            Instant now = Instant.now();
+            //conversion de l'objet OffsetDateTime ISO vers Instant pour etre aussi en UTC+0
+            Instant dateUpdate = isoDate.toInstant();
 
             // Calculer la différence en millisecondes
-            long diffMillis = now.getTime() - dateUpdate.getTime();
+            long diffMillis = now.toEpochMilli()-dateUpdate.toEpochMilli();
             long diffMinutes = diffMillis / (60 * 1000);
             long diffHours = diffMinutes / 60;
             long remainingMinutes = diffMinutes % 60;
@@ -361,14 +356,14 @@ public class LoadApiDetail  implements Runnable{
         return delta;
     }
 
-    void addGeneralStatus (String statusCouleur, JSONObject json,String fuseauHoraire) throws NumberFormatException{
+    void addGeneralStatus (String statusCouleur, JSONObject json) throws NumberFormatException{
         StringTokenizer st = new StringTokenizer(statusCouleur,";");
         String status = st.nextToken();
         int color = Integer.parseInt(st.nextToken());
         int colorBg = Integer.parseInt(st.nextToken());
         String hour;
         try {
-            hour = extractHour(json.getJSONObject("page"),fuseauHoraire);
+            hour = extractHour(json.getJSONObject("page"));
         } catch (JSONException e) {
             hour = "Il y a -- h";
         }
@@ -437,15 +432,6 @@ public class LoadApiDetail  implements Runnable{
         }
         return generalStatus;
     }
-    String extractFuseauHoraire (JSONObject json){
-        String fuseauHoraire = "";
-        try {
-            fuseauHoraire = json.getJSONObject("page").getString("time_zone");
-        } catch (JSONException e) {
-            fuseauHoraire = "UTC";
-        }
-        return fuseauHoraire;
-    }
 
     static JSONArray extractDataFromJson (JSONObject json, String name){
         JSONArray data;
@@ -492,18 +478,15 @@ public class LoadApiDetail  implements Runnable{
         //
         // Requête Status Général
         //
-        String fuseauHoraire = extractFuseauHoraire(json);
         String generalStatus = extractGeneralStatus(json);
-        addGeneralStatus(Service.status(generalStatus,activity),json, fuseauHoraire);
-        // Récupération du fuseau orraire
-
+        addGeneralStatus(Service.status(generalStatus,activity),json);
 
         //
         // Requête Problème en cours
         //
         JSONArray incidents = extractDataFromJson(json,"incidents");
         try {
-            addProbleme(incidents,fuseauHoraire);
+            addProbleme(incidents);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -513,7 +496,7 @@ public class LoadApiDetail  implements Runnable{
         //
         JSONArray maintenances = extractDataFromJson(json,"scheduled_maintenances");
         // Log.d("test","Maintenances : "+ maintenances);
-        addMaintenances(maintenances,fuseauHoraire);
+        addMaintenances(maintenances);
 
         //
         // Affichage des component et de leur état
