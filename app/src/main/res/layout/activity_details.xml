@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
 
     <LinearLayout
@@ -15,25 +16,25 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
             android:gravity="center_vertical"
-            android:layout_marginTop="20dp">
+            android:orientation="horizontal">
             <!--android:layout_marginBottom="24dp">-->
 
             <!-- entète avec le nom et le bouton pour refresh-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
                 <!-- Logo -->
                 <ImageView
                     android:id="@+id/logo"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:src="@mipmap/ic_launcher"
+                    android:contentDescription="@string/app_icon"
                     android:padding="8dp"
-                    android:contentDescription="@string/app_icon"/>
+                    android:src="@mipmap/ic_launcher" />
 
 
                 <!-- Nom-->
@@ -83,11 +84,11 @@
                     android:id="@+id/card_global_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:padding="5dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="2dp"
-                    android:layout_margin="8dp"
-                    android:padding="5dp">
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -99,25 +100,27 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
                             android:text="@string/geneStatus"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
                             android:textColor="#1F2937"
-                            android:layout_marginBottom="12dp" />
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/statusGeneralBG"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="8dp"
+                            app:cardBackgroundColor="@color/status_inconnu_bg"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="2dp"
-                            app:strokeWidth="2dp"
-                            app:cardBackgroundColor="@color/status_inconnu_bg">
+                            app:strokeWidth="2dp">
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
                                 android:gravity="center_vertical"
+                                android:orientation="horizontal"
                                 android:padding="12dp">
 
                                 <View
@@ -125,27 +128,28 @@
                                     android:layout_width="12dp"
                                     android:layout_height="12dp"
                                     android:background="@drawable/circle_shape"
-                                    android:backgroundTint="@color/status_inconnu"/>
+                                    android:backgroundTint="@color/status_inconnu" />
 
                                 <TextView
                                     android:id="@+id/statusText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
                                     android:text="Statut Inconnue"
-                                    android:textSize="16sp"
                                     android:textColor="@color/status_inconnu"
-                                    android:textStyle="bold"
-                                    android:layout_marginStart="12dp" />
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
                                 <Space
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"/>
+                                    android:layout_weight="1" />
+
                                 <TextView
                                     android:id="@+id/textClock"
                                     android:layout_width="wrap_content"
                                     android:layout_height="match_parent"
-                                    android:textColor="@android:color/black"
-                                    />
+                                    android:textColor="@android:color/black" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
@@ -161,28 +165,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:padding="5dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="2dp"
-                    android:padding="5dp">
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="horizontal">
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="@string/pbEnCours"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
                                 android:textColor="#1F2937"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
                             <Space
                                 android:layout_width="0dp"
                                 android:layout_height="1dp"
@@ -196,11 +203,12 @@
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:src="@drawable/dropdown" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/cardPb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"/>
+                            android:orientation="vertical" />
 
                     </LinearLayout>
 
@@ -211,16 +219,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:padding="5dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="2dp"
-                    android:padding="5dp">
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -229,11 +238,11 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="@string/maintenances"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
                                 android:textColor="#1F2937"
-                                android:layout_marginBottom="12dp" />
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
                             <Space
                                 android:layout_width="0dp"
@@ -248,11 +257,12 @@
                                 android:src="@drawable/dropdown" />
 
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/cardMaintenance"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"/>
+                            android:orientation="vertical" />
 
 
                     </LinearLayout>
@@ -264,10 +274,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:padding="5dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="2dp"
-                    android:padding="5dp">
+                    app:strokeWidth="2dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -282,11 +293,11 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:text="@string/components"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
                                 android:textColor="#1F2937"
-                                android:layout_marginBottom="12dp"/>
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
                             <Space
                                 android:layout_width="0dp"
@@ -301,11 +312,12 @@
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:src="@drawable/dropdown" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/cardComponents"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"/>
+                            android:orientation="vertical" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
