@@ -39,4 +39,9 @@
     <string name="verifying">En vérification</string>
     <string name="completed">Finis</string>
     <string name="resolved">Résolut</string>
+
+    <!-- problème connexion -->
+    <string name="error_title">Connexion Internet requise</string>
+    <string name="error_description">Cette application nécessite une connexion Internet. Veuillez activer le Wi-Fi ou les données mobiles pour continuer.</string>
+
 </resources>

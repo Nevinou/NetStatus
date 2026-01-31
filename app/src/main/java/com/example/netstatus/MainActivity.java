@@ -1,6 +1,12 @@
 package com.example.netstatus;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,18 +14,19 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends NetworkDetector {
     List<Service> services;
+    LinearLayout layout;
 
     void loadAll(){
         SQLGestion gestionnaire = new SQLGestion(this); //création objet db
@@ -58,46 +65,7 @@ public class MainActivity extends AppCompatActivity {
         //ajout des urls qui utilisent statuspage.io + image + nom (utile pour la recherche)
     }
 
-    void init(){
-
-        //on prend le boutton de l'activity qui a l'id "more"
-        Button more = findViewById(R.id.more);
-        more.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //on fait un itent pour changer de page
-                Intent intent = new Intent(MainActivity.this,AllServicesActivity.class);
-                intent.putExtra("allServices", (ArrayList<Service>)services);
-                startActivity(intent); //on change d'activity
-            }
-        });
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-
-        setContentView(R.layout.activity_main); //rend visible
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left+20, systemBars.top, systemBars.right+20, systemBars.bottom);
-            return insets;
-        });
-
-        init(); //appel de la méthode init
-    }
-
-    @Override
-    protected void onResume() { //run a chaque affichage
-        //run au démarrage et a chaque reprise due au finish()
-        super.onResume();
-
-        LinearLayout layout = findViewById(R.id.main);
-        layout.removeAllViews(); //clear
-
-        loadAll();
-
+    List<Service> getFavoris(){
         List<String> bestNames = new ArrayList<String>();
         bestNames.add("Discord");
         bestNames.add("Epic Games");
@@ -117,11 +85,79 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (favories.isEmpty()){
-            favories = bestServices;
+            return bestServices;
         }
+        return favories;
+    }
 
-        //le réseau doit être fait dans un thread externe
-        Thread thread = new Thread(new LoadAPI(this,favories));
-        thread.start();
+    void init(){
+
+        //on prend le boutton de l'activity qui a l'id "more"
+        Button more = findViewById(R.id.more);
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //on fait un itent pour changer de page
+                Intent intent = new Intent(MainActivity.this,AllServicesActivity.class);
+                intent.putExtra("allServices", (ArrayList<Service>)services);
+                startActivity(intent); //on change d'activity
+            }
+        });
+
+    }
+
+    @Override
+    void resumeApp(){
+        if (services != null){
+            hideError();
+            //clear si les frames existes deja
+            List<Service> favories = getFavoris();
+            Thread thread = new Thread(new LoadAPI(this,favories));
+            thread.start();
+        }
+    }
+
+    @Override
+    void hideAction(){
+        layout.removeAllViews();//UI thread
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main); //rend visible
+
+        layout = findViewById(R.id.main);
+        ViewCompat.setOnApplyWindowInsetsListener(layout, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left+20, systemBars.top, systemBars.right+20, systemBars.bottom);
+            return insets;
+        });
+
+        init(); //appel de la méthode init
+    }
+
+    @Override
+    protected void onResume() { //run a chaque affichage
+        //run au démarrage et a chaque reprise due au finish()
+        super.onResume();
+
+        layout.removeAllViews(); //clear
+
+        loadAll();
+
+        List<Service> favories = getFavoris();
+
+        boolean internet = checkInternet();
+
+        if (!internet){
+            displayError();
+        }
+        else{
+            //le réseau doit être fait dans un thread externe
+            Thread thread = new Thread(new LoadAPI(this,favories));
+            thread.start();
+        }
     }
 }

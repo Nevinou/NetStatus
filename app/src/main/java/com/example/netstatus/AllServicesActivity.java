@@ -21,7 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllServicesActivity extends AppCompatActivity {
+public class AllServicesActivity extends NetworkDetector {
     List<Service> services;
     int count;
     final int increment = 10;
@@ -37,6 +37,13 @@ public class AllServicesActivity extends AppCompatActivity {
         return next;
     }
 
+    void resetActivity(){
+        count = 10;
+        List<Service> mustLoad = loadMore();
+        Thread thread = new Thread(new LoadAPI(this,mustLoad));
+        thread.start();
+    }
+
     void filterServices(String text) {
         List<Service> toLoad = new ArrayList<Service>();
 
@@ -49,7 +56,21 @@ public class AllServicesActivity extends AppCompatActivity {
         Thread thread = new Thread(new LoadAPI(this,toLoad)); //on charge la suite
         thread.start();
     }
-    void init(){;
+
+    @Override
+    void resumeApp(){
+        if (services != null){
+            hideError();
+            resetActivity();
+        }
+    }
+
+    @Override
+    void hideAction(){
+        layout.removeAllViews();//UI thread
+    }
+
+    void init(){
         Intent intent = getIntent();
         services = (ArrayList<Service>) intent.getSerializableExtra("allServices");
         count = 10;
@@ -97,10 +118,7 @@ public class AllServicesActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) { //appuit sur une touche
                 if (newText.equals("")){
                     layout.removeAllViews();
-                    count = 10;
-                    List<Service> mustLoad = loadMore();
-                    Thread thread = new Thread(new LoadAPI(current,mustLoad));
-                    thread.start();
+                    resetActivity();
                 }
                 return true;
             }

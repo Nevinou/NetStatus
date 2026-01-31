@@ -19,7 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.HashMap;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends NetworkDetector {
     final HashMap<String,String> dicoSatus = new HashMap<>();
     String status,urlApi,serviceName;
 
