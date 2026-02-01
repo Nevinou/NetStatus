@@ -45,7 +45,10 @@ public class DetailsActivity extends NetworkDetector {
         thread.start();
         try {
             thread.join();
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) {
+            Log.e("ThreadJoin", "Attente du thread interrompue : " + e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        }
 
         //
         // Ajout du titre
