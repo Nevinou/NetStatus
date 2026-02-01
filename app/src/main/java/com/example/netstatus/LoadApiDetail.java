@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -71,8 +72,6 @@ public class LoadApiDetail  implements Runnable{
                     ajoutCardProbleme(incidents.getJSONObject(i));
                 } catch (JSONException e) {
                     Log.e("ProblemLaod", "Erreur lors de la récupération de l'incident: " + e.getMessage(),e);
-                } catch (Exception e) {
-                    Log.e("ProblemLaod", "Erreur inattendue: " + e.getMessage(),e);
                 }
             }
         }
@@ -95,7 +94,7 @@ public class LoadApiDetail  implements Runnable{
             Log.e("ProblemLaod","Erreur lors de la lecture des données de l'incident : " + e.getMessage(),e);
         } catch (NoSuchElementException e){
             Log.e("ProblemLaod","Format de statut invalide : " + e.getMessage(),e);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             Log.e("ProblemLaod","Erreur inattendue: " + e.getMessage(),e);
         }
 
@@ -154,8 +153,6 @@ public class LoadApiDetail  implements Runnable{
                     ajoutCardMaintenance(maintenances.getJSONObject(i));
                 } catch (JSONException e) {
                     Log.e("maintenanceLoad", "Erreur de la lecture des données de l'incident : " + e.getMessage(),e);
-                } catch (Exception e) {
-                    Log.e("maintenanceLoad", "Erreur inattendue: " + e.getMessage(),e);
                 }
             }
         }
@@ -173,10 +170,6 @@ public class LoadApiDetail  implements Runnable{
             impact = maintenance.getString("impact");
         } catch (JSONException e ){
             Log.e("maintenanceLoad","Erreur lors de la lecture des données de l'incident : " + e.getMessage(),e);
-        } catch (NoSuchElementException e){
-            Log.e("maintenanceLoad","Erreur format de statut invalide : " + e.getMessage(),e);
-        } catch (Exception e) {
-            Log.e("maintenanceLoad", "Erreur inattendue: " + e.getMessage(),e);
         }
         String finalName = name;
         StringTokenizer st = new StringTokenizer(Service.status(impact,activity),";");
@@ -236,7 +229,7 @@ public class LoadApiDetail  implements Runnable{
             dateHour.add(hourFormat.format(dateFin));    // [2] Heure de fin
             dateHour.add(dateFormat.format(dateFin));    // [3] Date de fin
 
-        }catch (Exception e) {
+        }catch (JSONException | DateTimeParseException e) {
             dateHour.add("--:--");
             dateHour.add("--/--/----");
             dateHour.add("--:--");
@@ -264,8 +257,6 @@ public class LoadApiDetail  implements Runnable{
                     addComponent(component);
                 } catch (JSONException e) {
                     Log.e("componentLoad","Composant invalide à l'index " + i + " : " + e.getMessage(),e);
-                } catch (Exception e) {
-                    Log.e("componentLoad","Erreur lors de l'ajout du composant " + i + " : " + e.getMessage(),e);
                 }
             }
         }
@@ -278,7 +269,7 @@ public class LoadApiDetail  implements Runnable{
         try {
             name = component.getString("name");
             status = component.getString("status");
-        } catch (Exception e) {
+        } catch (JSONException e) {
             name = activity.getString(R.string.unknowName);
             status = activity.getString(R.string.unknown);
             Log.e("componentLoad","Erreur lors de la récupération des noms: "+e.getMessage(),e);
@@ -342,7 +333,7 @@ public class LoadApiDetail  implements Runnable{
                 delta = "À l'instant";
             }
 
-        } catch (Exception e) {
+        } catch (JSONException | DateTimeParseException e) {
             Log.e("DateParsing","Erreur lors de l'extraction de l'heure : " + e.getMessage(),e);
             delta = "Il y a -- h";
         }
@@ -360,9 +351,6 @@ public class LoadApiDetail  implements Runnable{
         } catch (JSONException e) {
             hour = "Il y a -- h";
             Log.e("statusGeneLoad", "Erreur lors de la récupération de l'heure: " + e.getMessage(),e);
-        } catch (Exception e) {
-            hour = "Il y a -- h";
-            Log.e("statusGeneLoad", "Erreur inattendue: " + e.getMessage(),e);
         }
         String finalHour = hour;
 
@@ -401,7 +389,6 @@ public class LoadApiDetail  implements Runnable{
     }
 
     JSONObject loadJson (String path){
-        JSONObject json;
         try {
             URL url = new URL(service.getApi() + "/api/v2/"+path); //création url
             URLConnection conn = url.openConnection(); //ajouter la permission internet dans le manifest ! Ouverture de la connexion
@@ -413,21 +400,15 @@ public class LoadApiDetail  implements Runnable{
             }
             reader.close();
             //Log.d("JSON",total);
-            json = new JSONObject(pageWeb); //création d'un JSONObject
+            return new JSONObject(pageWeb); //création d'un JSONObject
         } catch (MalformedURLException e) {
-            json = null;
             Log.e("APICall", "URL invalide : " + e.getMessage(), e);
-        } catch (JSONException e) {
-            Log.e("APICall", "Réponse JSON invalide : " + e.getMessage(), e);
-            json = null;
         } catch (IOException e) {
             Log.e("APICall", "Erreur réseau : " + e.getMessage(), e);
-            json = null;
-        } catch (Exception e) {
-            json = null;
-            Log.e("APICall", "Erreur inattendue : " + e.getMessage(), e);
+        } catch (JSONException e) {
+            Log.e("APICall", "Réponse JSON invalide : " + e.getMessage(), e);
         }
-        return json;
+        return null;
     }
 
     String extractGeneralStatus (JSONObject json){
@@ -437,9 +418,6 @@ public class LoadApiDetail  implements Runnable{
             generalStatus = stat.getString("indicator");
         } catch (JSONException e) {
             Log.e("StatusParsing", "Erreur JSON : " + e.getMessage(), e);
-            generalStatus = activity.getString(R.string.unknown);
-        } catch (Exception e) {
-            Log.e("StatusParsing", "Erreur inattendue: " + e.getMessage(), e);
             generalStatus = activity.getString(R.string.unknown);
         }
         return generalStatus;
@@ -480,10 +458,10 @@ public class LoadApiDetail  implements Runnable{
                     logo = loadLogo();
                     // Ajout du log sur l'interface graphique
                     addLogo(logo);
+                } catch (MalformedURLException e) {
+                    Log.e("ImageLoad", "Erreur inattendue: " + e.getMessage());
                 } catch (IOException e) {
                     Log.e("ImageLoad", "Erreur lors du téléchargement de l'image: " + e.getMessage());
-                } catch (Exception e) {
-                    Log.e("ImageLoad", "Erreur inattendue: " + e.getMessage());
                 }
             }
         }).start();

@@ -11,7 +11,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,16 +27,12 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de run
     Activity activity;
@@ -125,14 +120,18 @@ public class LoadAPI implements Runnable{ //implements runnabe, redéfinition de
 
                 TextView clock = card.findViewById(R.id.lastUpdate);
 
-
-                OffsetDateTime isoDate = OffsetDateTime.parse(date);
-                //notre date est ISO 8601, on instancie un objet date ISO 8601
-                DateTimeFormatter newDate = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
-                //on formate cela en format jour/mois/année heure:min:sec avec la timezone du téléphone
-                //la timeZone téléphone dépend de l'utilisateur et la date ISO a un offset
-                //la méthode format va convertir la date ISO en format voulu avec la timezone du tel
-                String localTime = newDate.format(isoDate);
+                String localTime = "Unknown";
+                try{
+                    OffsetDateTime isoDate = OffsetDateTime.parse(date);
+                    //notre date est ISO 8601, on instancie un objet date ISO 8601
+                    DateTimeFormatter newDate = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+                    //on formate cela en format jour/mois/année heure:min:sec avec la timezone du téléphone
+                    //la timeZone téléphone dépend de l'utilisateur et la date ISO a un offset
+                    //la méthode format va convertir la date ISO en format voulu avec la timezone du tel
+                    localTime = newDate.format(isoDate);
+                }catch (DateTimeParseException e){
+                    displayAlert("Erreur de chargement de l'heure");
+                }
 
                 clock.setText(localTime);
 

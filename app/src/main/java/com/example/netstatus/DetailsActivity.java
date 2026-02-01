@@ -4,23 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.HashMap;
-
 public class DetailsActivity extends NetworkDetector {
-    final HashMap<String,String> dicoSatus = new HashMap<>();
     String status,urlApi,serviceName;
 
     @NonNull
@@ -53,8 +48,10 @@ public class DetailsActivity extends NetworkDetector {
         //
         // Ajout du titre
         //
-        TextView title = findViewById(R.id.nomService);
-        title.setText(service.getName());
+        if (service != null) {
+            TextView title = findViewById(R.id.nomService);
+            title.setText(service.getName());
+        }
 
         //
         // Création des Boutons

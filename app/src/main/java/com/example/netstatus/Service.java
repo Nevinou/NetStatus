@@ -3,7 +3,6 @@ package com.example.netstatus;
 import android.app.Activity;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Service implements Serializable {
@@ -31,10 +30,6 @@ public class Service implements Serializable {
 
     public String toString(){
         return "Application "+name+" avec comme api "+api+" et comme image "+image+" favori : "+favorite;
-    }
-
-    String toCsv (){
-        return name+";"+api+";"+image+";"+favorite;
     }
 
     public String getName() {
