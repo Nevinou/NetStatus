@@ -30,7 +30,9 @@
                 android:text="Mise à jour infrastructure"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/status_maintenance"/>
+                android:textColor="@color/status_maintenance"
+                android:maxLines="2"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/maintenanceStatus"

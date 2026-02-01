@@ -22,7 +22,9 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:textStyle="bold"/><!--android:textColor="@color/status_critique"-->
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"/><!--android:textColor="@color/status_critique"-->
 
         <LinearLayout
             android:id="@+id/indicator"
@@ -43,17 +45,14 @@
 
             <TextView
                 android:id="@+id/impact"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Statut Inconnue"
                 android:textSize="16sp"
                 android:textColor="@color/status_inconnu"
                 android:textStyle="bold"
-                android:layout_marginStart="12dp" />
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_marginStart="12dp"/>
             <TextView
                 android:id="@+id/lastModif"
                 android:layout_width="wrap_content"
