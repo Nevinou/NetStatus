@@ -15,8 +15,10 @@
 
     <TextView
         android:id="@+id/nameComponent"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
+        android:maxWidth="200dp"
         android:layout_height="wrap_content"
+        android:layout_weight="0"
         android:textSize="16sp"
         android:textColor="@color/status_inconnu"
         android:textStyle="bold"
@@ -31,5 +33,6 @@
         android:textColor="@color/status_inconnu"
         android:layout_marginStart="12dp"
         android:maxLines="3"
-        android:ellipsize="end"/>
+        android:ellipsize="end"
+        android:gravity="end"/>
 </LinearLayout>
