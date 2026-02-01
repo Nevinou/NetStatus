@@ -21,17 +21,15 @@
         android:textColor="@color/status_inconnu"
         android:textStyle="bold"
         android:layout_marginStart="12dp"/>
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+
     <TextView
         android:id="@+id/statusComponent"
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="16sp"
         android:textColor="@color/status_inconnu"
-        android:layout_marginStart="12dp"/>
-
-
+        android:layout_marginStart="12dp"
+        android:maxLines="3"
+        android:ellipsize="end"/>
 </LinearLayout>
